@@ -6,6 +6,6 @@
   <span
     class="block border border-red-600 bg-red-600 px-12 py-3 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1"
   >
-    Download
+    {{ $slot }}
   </span>
 </a>

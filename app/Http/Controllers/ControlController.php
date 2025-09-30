@@ -3,26 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class ControlController extends Controller
 {
+    public $espIp;
+
+    public function __construct()
+    {
+        $this->espIp = env('ESP_IP');
+    }
+
     public function index()
     {
         return view('control');
     }
 
-    public function toggle(Request $request, $state)
+    public function toggle($state)
     {
-        $espIp = env('ESP_IP', '192.168.1.50');
-        $url = "http://{$espIp}/control/{$state}";
+        $url = "http://{$this->espIp}/control/$state";
 
-        try {
-            $resp = Http::timeout(3)->get($url);
-            return response()->json(['ok' => true, 'esp' => $resp->json()]);
-        } catch (\Exception $e) {
-            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
-        }
+        // POST request naar ESP
+        $options = [
+            'http' => [
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/json\r\n",
+            ]
+        ];
+        $context = stream_context_create($options);
+
+        $result = file_get_contents($url, false, $context);
+
+        return response($result)->header('Content-Type', 'application/json');
     }
 
+    public function espStatus()
+    {
+        $espIp = env('ESP_IP');
+
+        try {
+            $response = file_get_contents("http://$espIp/control/status");
+            return response($response)->header('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Kan ESP niet bereiken'], 500);
+        }
+    }
 }

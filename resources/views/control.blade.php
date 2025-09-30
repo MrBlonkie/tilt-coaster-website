@@ -1,14 +1,21 @@
 <x-layout>
-    <h1>CONTROL</h1>
 
-<div id="led-status" style="width:30px; height:30px; border-radius:50%; background-color:grey; margin-top:20px; margin-bottom: 20px;"></div>
-<div id="led-status-text">laden...</div>
+<x-control-card showStatus class="max-w-md mx-auto">
+    <p class="text-gray-500 text-sm">
+        ONBOARD LED
+    </p>
+
+    <x-slot name="buttons">
+        <x-esp-button onclick="postLed('on')" class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
+            ON <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180"></span>
+        </x-esp-button>
+        <x-esp-button onclick="postLed('off')" class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
+            OFF <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180"></span>
+        </x-esp-button>
+    </x-slot>
+</x-control-card>
 
 
-
-
-<x-esp-button onclick="postLed('on')">LED On</x-esp-button>
-<x-esp-button onclick="postLed('off')">LED Off</x-esp-button>
 
 <script>
 async function postLed(state) {
@@ -44,7 +51,7 @@ async function updateLedStatus() {
 }
 
 // iedere 2 seconden updaten
-setInterval(updateLedStatus, 200);
+setInterval(updateLedStatus, 1000);
 updateLedStatus(); // meteen eerste keer ophalen
 </script>
 

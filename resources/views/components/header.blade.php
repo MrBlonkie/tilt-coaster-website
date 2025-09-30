@@ -2,6 +2,9 @@
     <div>
         <title>Tilt-Coaster</title>
     </div>
+    
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
     <div class="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
         <a class="block text-[var(--color-primary)] dark:text-[var(--color-secondary)]" href="#">

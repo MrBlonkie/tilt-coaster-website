@@ -11,3 +11,6 @@ Route::get('/', function () {
 
 //ControlController
 Route::get('/control', [ControlController::class, 'index'])->name('control.index');
+
+Route::post('/control/{state}', [ControlController::class, 'toggle'])
+    ->where('state', 'on|off');

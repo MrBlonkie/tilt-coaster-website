@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Http;
 
 use Illuminate\Http\Request;
 
@@ -18,33 +19,24 @@ class ControlController extends Controller
         return view('control');
     }
 
-    public function toggle($state)
-    {
-        $url = "http://{$this->espIp}/control/$state";
-
-        // POST request naar ESP
-        $options = [
-            'http' => [
-                'method'  => 'POST',
-                'header'  => "Content-Type: application/json\r\n",
-            ]
-        ];
-        $context = stream_context_create($options);
-
-        $result = file_get_contents($url, false, $context);
-
-        return response($result)->header('Content-Type', 'application/json');
-    }
-
-    public function espStatus()
+    public function ledControl($state)
     {
         $espIp = env('ESP_IP');
+        $res = Http::post("http://$espIp/control/$state");
+        return response()->json($res->json());
+    }
 
-        try {
-            $response = file_get_contents("http://$espIp/control/status");
-            return response($response)->header('Content-Type', 'application/json');
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Kan ESP niet bereiken'], 500);
-        }
+    public function motorControl($state)
+    {
+        $espIp = env('ESP_IP');
+        $res = Http::post("http://$espIp/motor/$state");
+        return response()->json($res->json());
+    }
+
+    public function status()
+    {
+        $espIp = env('ESP_IP');
+        $res = Http::get("http://$espIp/control/status");
+        return response()->json($res->json());
     }
 }

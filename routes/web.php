@@ -12,8 +12,6 @@ Route::get('/', function () {
 //ControlController
 Route::get('/control', [ControlController::class, 'index'])->name('control.index');
 
-Route::post('/control/{state}', [ControlController::class, 'toggle'])
-    ->where('state', 'on|off');
-
-
-Route::get('/esp/status', [ControlController::class, 'espStatus']);
+Route::post('/led/{state}', [ControlController::class, 'ledControl']);
+Route::post('/motor/{state}', [ControlController::class, 'motorControl']);
+Route::get('/control/status', [ControlController::class, 'status']);

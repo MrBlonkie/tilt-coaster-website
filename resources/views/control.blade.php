@@ -1,5 +1,7 @@
 <x-layout>
 
+<x-toggle name='monitoring' id='monitoring'/>
+
 <x-control-card showStatus class="max-w-md mx-auto">
     <p class="text-gray-500 text-sm">
         ONBOARD LED
@@ -17,7 +19,10 @@
 
 
 
+
 <script>
+let updateInterval = null;
+
 async function postLed(state) {
     const res = await fetch(`/control/${state}`, {
         method: 'POST',
@@ -50,9 +55,18 @@ async function updateLedStatus() {
     }
 }
 
-// iedere 2 seconden updaten
-setInterval(updateLedStatus, 1000);
-updateLedStatus(); // meteen eerste keer ophalen
+// toggle monitoring aan/uit
+document.getElementById('monitoring').addEventListener('change', function(e) {
+    if (e.target.checked) {
+        // direct 1x uitvoeren en daarna elke 2s
+        updateLedStatus();
+        updateInterval = setInterval(updateLedStatus, 2000);
+    } else {
+        // stop polling
+        clearInterval(updateInterval);
+        updateInterval = null;
+    }
+});
 </script>
 
 

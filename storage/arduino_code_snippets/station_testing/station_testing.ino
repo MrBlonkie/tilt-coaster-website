@@ -103,7 +103,6 @@ bool dispatching = false;
 void handleDispatch() {
   
   DispatchCoaster();
-  handleAutoControllerStatus();
 
 }
 
@@ -128,7 +127,7 @@ void handleAutoControlStatus() {
   json += "\"hallSensorExitStation\":"; json += (hallSensorExitStationState ? "true" : "false");
   json += "\"hallSensorBottomLifthill\":"; json += (hallSensorBottomLifthillState ? "true" : "false");
   json += "\"hallSensorEnterStation\":"; json += (hallSensorEnterStationState ? "true" : "false");
-  json += "\"hallSensorExitStartPosition\":"; json += (hallSensorExitStartPositionState ? "true" : "false");
+  json += "\"hallSensorExitStation\":"; json += (hallSensorExitStationState ? "true" : "false");
   json += "}";
 
   server.send(200, "application/json", json);
@@ -194,14 +193,7 @@ void setup() {
   stationStepper.setSpeed(10);
   lifthillStepper.setSpeed(10);
 
-  xTaskCreate(
-    CheckHallSensors,          // functie die draait in task
-    "CheckHallSensors",        // naam van de task (voor debugging)
-    10000,           // stack size in bytes
-    NULL,            // parameter naar de task
-    1,               // prioriteit
-    NULL             // handle (optioneel)
-  );
+
 
 }
 

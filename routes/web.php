@@ -2,18 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\ControlController;
+use App\Http\Controllers\ManualControlController;
+use App\Http\Controllers\AutoControlController;
 
 Route::get('/', function () {
     return view('home');
 });
 
 
-//ControlController
-Route::get('/control', [ControlController::class, 'index'])->name('control.index');
+//ManualControlController
+Route::get('/manual-control', [ManualControlController::class, 'index'])->name('manual-control.index');
 
-Route::post('/led/{state}', [ControlController::class, 'ledControl']);
-Route::post('/stationmotor/{state}', [ControlController::class, 'stationMotorControl']);
-Route::post('/lifthillmotor/{state}', [ControlController::class, 'lifthillMotorControl']);
-Route::get('/control/status', [ControlController::class, 'status']);
+Route::post('/led/{state}', [ManualControlController::class, 'ledControl']);
+Route::post('/stationmotor/{state}', [ManualControlController::class, 'stationMotorControl']);
+Route::post('/lifthillmotor/{state}', [ManualControlController::class, 'lifthillMotorControl']);
+Route::get('/manual-control/status', [ManualControlController::class, 'status']);
 
+
+//AutoControlController
+Route::get('/auto-control', [AutoControlController::class, 'index'])->name('auto-control.index');

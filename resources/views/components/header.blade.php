@@ -25,11 +25,20 @@
                     </li>
 
                     <li>
-                        <a href="{{ url('/control') }}" class="transition 
-                            {{ request()->is('control') ? 'underline text-[var(--color-accent)]' : 'text-[var(--color-accent)] hover:text-[var(--color-highlight)]' }} 
+                        <a href="{{ url('/manual-control') }}" class="transition 
+                            {{ request()->is('manual-control') ? 'underline text-[var(--color-accent)]' : 'text-[var(--color-accent)] hover:text-[var(--color-highlight)]' }} 
                             dark:text-[var(--color-secondary)] 
                             dark:hover:text-[var(--color-highlight)]">
-                            Control
+                            Manual Control
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url('/auto-control') }}" class="transition 
+                            {{ request()->is('auto-control') ? 'underline text-[var(--color-accent)]' : 'text-[var(--color-accent)] hover:text-[var(--color-highlight)]' }} 
+                            dark:text-[var(--color-secondary)] 
+                            dark:hover:text-[var(--color-highlight)]">
+                            Auto Control
                         </a>
                     </li>
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class ControlController extends Controller
+class ManualControlController extends Controller
 {
     private $espIp;
 
@@ -16,7 +16,7 @@ class ControlController extends Controller
 
     public function index()
     {
-        return view('control');
+        return view('manual-control');
     }
 
     public function ledControl($state)
@@ -39,7 +39,7 @@ class ControlController extends Controller
 
     public function status()
     {
-        $response = Http::get("http://{$this->espIp}/control/status");
+        $response = Http::get("http://{$this->espIp}/manual-control/status");
         return response()->json($response->json());
     }
 }

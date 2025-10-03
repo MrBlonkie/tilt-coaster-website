@@ -64,7 +64,7 @@ async function postLed(state){
 
 async function updateLedStatus() {
     try {
-        const response = await fetch('/control/status'); 
+        const response = await fetch('/manual-control/status'); 
         if (!response.ok) throw new Error('Netwerkfout');
 
         const data = await response.json();
@@ -92,7 +92,7 @@ async function postStationMotor(state){
 
 async function updateStationMotorStatus() {
     try {
-        const response = await fetch('/control/status'); 
+        const response = await fetch('/manual-control/status'); 
         if (!response.ok) throw new Error('Netwerkfout');
 
         const data = await response.json();
@@ -119,7 +119,7 @@ async function postLiftMotor(state){
 
 async function updateLifthillMotorStatus() {
     try {
-        const response = await fetch('/control/status'); 
+        const response = await fetch('/manual-control/status'); 
         if (!response.ok) throw new Error('Netwerkfout');
 
         const data = await response.json();

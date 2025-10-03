@@ -1,60 +1,65 @@
 <x-layout>
 
-<x-toggle name='monitoring' id='monitoring'/>
+<x-toggle name="monitoring" id="monitoring"/>
 
+{{-- ONBOARD LED --}}
 <x-control-card showStatus class="max-w-md mx-auto">
-    <p class="text-gray-500 text-sm">
-        ONBOARD LED
-    </p>
-
+    <p class="text-gray-500 text-sm">ONBOARD LED</p>
     <x-slot name="buttons">
-        <x-esp-button onclick="postLed('on')" class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
-            ON <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180"></span>
-        </x-esp-button>
-        <x-esp-button onclick="postLed('off')" class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
-            OFF <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180"></span>
-        </x-esp-button>
+        <x-esp-button data-target="led" data-action="on">ON</x-esp-button>
+        <x-esp-button data-target="led" data-action="off">OFF</x-esp-button>
     </x-slot>
+    <div id="led-status" style="width:30px; height:30px; border-radius:50%; background-color:grey; margin-top:10px;"></div>
+    <div id="led-status-text">Laden...</div>
 </x-control-card>
 
-
+{{-- STATION MOTOR --}}
 <x-control-card showStatus class="max-w-md mx-auto mt-4">
-    <p class="text-gray-500 text-sm">
-        STATION MOTOR
-    </p>
-
+    <p class="text-gray-500 text-sm">STATION MOTOR</p>
     <x-slot name="buttons">
-        <x-esp-button onclick="postMotor('on')" class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
-            ON <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180"></span>
-        </x-esp-button>
-        <x-esp-button onclick="postMotor('off')" class="group inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
-            OFF <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180"></span>
-        </x-esp-button>
+        <x-esp-button data-target="stationmotor" data-action="on">ON</x-esp-button>
+        <x-esp-button data-target="stationmotor" data-action="off">OFF</x-esp-button>
     </x-slot>
-
-    <div id="motor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">
-        Laden...
-    </div>
+    <div id="stationmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
 </x-control-card>
 
-
+{{-- LIFTHILL MOTOR --}}
+<x-control-card showStatus class="max-w-md mx-auto mt-4">
+    <p class="text-gray-500 text-sm">LIFTHILL MOTOR</p>
+    <x-slot name="buttons">
+        <x-esp-button data-target="lifthillmotor" data-action="on">ON</x-esp-button>
+        <x-esp-button data-target="lifthillmotor" data-action="off">OFF</x-esp-button>
+    </x-slot>
+    <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+</x-control-card>
 
 <script>
+document.querySelectorAll('.js-esp-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        const action = btn.dataset.action;
 
-//ONBOARD LED SCRIPT
-let updateInterval = null;
-
-async function postLed(state) {
-    const res = await fetch(`/led/${state}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        switch(target){
+            case 'led':
+                postLed(action);
+                break;
+            case 'stationmotor':
+                postStationMotor(action);
+                break;
+            case 'lifthillmotor':
+                postLiftMotor(action);
+                break;
         }
     });
-    const data = await res.json();
-    console.log(data);
-    updateLedStatus(); // meteen status updaten na POST
+});
+
+// LED
+async function postLed(state){
+    await fetch(`/led/${state}`, {
+        method:'POST',
+        headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
+    });
+    updateLedStatus();
 }
 
 async function updateLedStatus() {
@@ -76,41 +81,57 @@ async function updateLedStatus() {
     }
 }
 
-//MOTOR SCRIPT
-async function postMotor(state) {
-    const res = await fetch(`/motor/${state}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
+// STATION MOTOR
+async function postStationMotor(state){
+    await fetch(`/stationmotor/${state}`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
     });
-    const data = await res.json();
-    console.log(data);
-    updateMotorStatus(); // meteen status updaten na POST
+    updateStationMotorStatus();
 }
 
-async function updateMotorStatus() {
+async function updateStationMotorStatus() {
     try {
         const response = await fetch('/control/status'); 
         if (!response.ok) throw new Error('Netwerkfout');
 
         const data = await response.json();
-        const motorDiv = document.getElementById('motor-status');
+        const statusDiv = document.getElementById('stationmotor-status');
 
-        if (data.stationMotor) {
-            motorDiv.textContent = "Motor draait";
-            motorDiv.style.backgroundColor = "green";
-        } else {
-            motorDiv.textContent = "Motor gestopt";
-            motorDiv.style.backgroundColor = "red";
-        }
+        statusDiv.style.backgroundColor = data.stationMotor ? "green" : "red";
+        statusDiv.textContent = data.stationMotor ? "Motor draait" : "Motor staat stil";
 
     } catch (error) {
-        console.error('Fout bij ophalen motor status:', error);
-        const motorDiv = document.getElementById('motor-status');
-        motorDiv.textContent = "Fout bij ophalen status";
-        motorDiv.style.backgroundColor = "grey";
+        console.error('Fout bij ophalen status:', error);
+        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
+        document.getElementById('led-status').style.backgroundColor = "grey";
+    }
+}
+
+// LIFTHILL MOTOR
+async function postLiftMotor(state){
+    await fetch(`/lifthillmotor/${state}`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
+    });
+    updateLifthillMotorStatus();
+}
+
+async function updateLifthillMotorStatus() {
+    try {
+        const response = await fetch('/control/status'); 
+        if (!response.ok) throw new Error('Netwerkfout');
+
+        const data = await response.json();
+        const statusDiv = document.getElementById('lifthillmotor-status');
+
+        statusDiv.style.backgroundColor = data.lifthillMotor ? "green" : "red";
+        statusDiv.textContent = data.lifthillMotor ? "Motor draait" : "Motor staat stil";
+
+    } catch (error) {
+        console.error('Fout bij ophalen status:', error);
+        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
+        document.getElementById('led-status').style.backgroundColor = "grey";
     }
 }
 
@@ -118,20 +139,19 @@ async function updateMotorStatus() {
 document.getElementById('monitoring').addEventListener('change', function(e) {
     if (e.target.checked) {
         updateLedStatus();
-        updateMotorStatus();
+        updateStationMotorStatus();
+        updateLifthillMotorStatus();
         updateInterval = setInterval(() => {
             updateLedStatus();
-            updateMotorStatus();
-        }, 2000);
+            updateStationMotorStatus();
+            updateLifthillMotorStatus();
+
+        }, 200);
     } else {
         clearInterval(updateInterval);
         updateInterval = null;
     }
 });
-
 </script>
 
-
-
 </x-layout>
-

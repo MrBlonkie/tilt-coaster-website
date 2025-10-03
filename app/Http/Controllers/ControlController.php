@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Http;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ControlController extends Controller
 {
-    public $espIp;
+    private $espIp;
 
     public function __construct()
     {
@@ -21,22 +21,27 @@ class ControlController extends Controller
 
     public function ledControl($state)
     {
-        $espIp = env('ESP_IP');
-        $res = Http::post("http://$espIp/control/$state");
-        return response()->json($res->json());
+        $response = Http::post("http://{$this->espIp}/led/{$state}");
+        return response()->json($response->json());
     }
 
-    public function motorControl($state)
+    public function stationMotorControl($state)
     {
-        $espIp = env('ESP_IP');
-        $res = Http::post("http://$espIp/motor/$state");
-        return response()->json($res->json());
+        $response = Http::post("http://{$this->espIp}/motor/station/{$state}");
+        return response()->json($response->json());
+    }
+
+    public function lifthillMotorControl($state)
+    {
+        $response = Http::post("http://{$this->espIp}/motor/lifthill/{$state}");
+        return response()->json($response->json());
     }
 
     public function status()
     {
-        $espIp = env('ESP_IP');
-        $res = Http::get("http://$espIp/control/status");
-        return response()->json($res->json());
+        $response = Http::get("http://{$this->espIp}/control/status");
+        return response()->json($response->json());
     }
 }
+
+

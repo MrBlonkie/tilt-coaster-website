@@ -34,6 +34,8 @@
 </x-control-card>
 
 <script>
+let updateInterval = null;
+
 document.querySelectorAll('.js-esp-button').forEach(btn => {
     btn.addEventListener('click', () => {
         const target = btn.dataset.target;
@@ -152,6 +154,12 @@ document.getElementById('monitoring').addEventListener('change', function(e) {
         updateInterval = null;
     }
 });
+
+window.addEventListener('beforeunload', () => {
+    if (updateInterval) clearInterval(updateInterval);
+});
+
+
 </script>
 
 </x-layout>

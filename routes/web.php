@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ManualControlController;
@@ -21,3 +22,19 @@ Route::get('/manual-control/status', [ManualControlController::class, 'status'])
 
 //AutoControlController
 Route::get('/auto-control', [AutoControlController::class, 'index'])->name('auto-control.index');
+
+Route::post('/dispatch/go', [AutoControlController::class, 'dispatchControl']);
+Route::get('/auto-control/status', [AutoControlController::class, 'status']);
+
+
+//TESTING
+Route::get('/test', [TestController::class, 'index'])->name('test.index');
+// proxy routes naar ESP
+Route::get('/esp/status', [TestController::class, 'status']);
+Route::post('/esp/manual/on', [TestController::class, 'manualOn']);
+Route::post('/esp/manual/off', [TestController::class, 'manualOff']);
+Route::post('/esp/manual/station/on', [TestController::class, 'stationMotorOn']);
+Route::post('/esp/manual/station/off', [TestController::class, 'stationMotorOff']);
+Route::post('/esp/manual/lifthill/on', [TestController::class, 'lifthillMotorOn']);
+Route::post('/esp/manual/lifthill/off', [TestController::class, 'lifthillMotorOff']);
+Route::post('/esp/dispatch/go', [TestController::class, 'dispatchGo']);

@@ -19,6 +19,19 @@ class AutoControlController extends Controller
         return view('auto-control');
     }
 
+    public function dispatchControl()
+    {
+        $response = Http::post("http://{$this->espIp}/dispatch/go");
+        return response()->json($response->json());
+    }
+
+    public function status()
+    {
+        $response = Http::get("http://{$this->espIp}/auto-control/status");
+        return response()->json($response->json());
+    }
+
+
 }
 
 

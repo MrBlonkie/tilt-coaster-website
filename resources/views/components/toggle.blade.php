@@ -16,6 +16,7 @@
         <span class="toggler-on"></span>
         <span class="toggler-off"></span>
     </label>
+    {{ $slot }}
 </div>
 
 

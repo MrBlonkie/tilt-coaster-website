@@ -18,6 +18,16 @@
                 <div class="outside-track">
                     <div class="sensor" id="bottomLifthill"></div>
                 </div>
+                <div class="outside-track">
+                    <div class="sensor" id="topLifthill"></div>
+                </div>
+
+                <div class="tiltdrop-track">
+                    <div class="sensor" id="tiltdropClosed"></div>
+                    <div class="sensor" id="tiltdropOpen"></div>
+                    <div class="sensor" id="coasterOnTiltdrop"></div>
+                </div>
+
             </div>
         </div>
 
@@ -34,141 +44,181 @@
 </x-layout>
 
 <script>
-const BASE_URL = "/esp";
-
-/* UPDATE SENSOR + MODE/STATE STATUS */
-async function updateStatus() {
+    /* UPDATE SENSOR + MODE/STATE STATUS */
+    async function updateStatus() {
     try {
-        const res = await fetch(`${BASE_URL}/status`);
-        if (!res.ok) return;
-        const data = await res.json();
+        // --- Station ESP status ---
+        const resStation = await fetch('/auto-control/status');
+        const dataStation = await resStation.json();
+        document.querySelector("#state").textContent = dataStation.currentState;
+        document.querySelector("#mode").textContent = dataStation.manualMode ? "Manual" : "Auto";
 
-        document.querySelector("#state").textContent = data.currentState;
-        document.querySelector("#mode").textContent = data.manualMode ? "Manual" : "Auto";
+        document.querySelector("#exitStation").classList.toggle("active", dataStation.hallSensorExitStation);
+        document.querySelector("#bottomLifthill").classList.toggle("active", dataStation.hallSensorBottomLifthill);
+        document.querySelector("#topLifthill").classList.toggle("active", dataStation.hallSensorTopLifthill);
+        document.querySelector("#enterStation").classList.toggle("active", dataStation.hallSensorEnterStation);
+        document.querySelector("#startPosition").classList.toggle("active", dataStation.hallSensorStartPosition);
 
-        document.querySelector("#exitStation").classList.toggle("active", data.hallSensorExitStation);
-        document.querySelector("#bottomLifthill").classList.toggle("active", data.hallSensorBottomLifthill);
-        document.querySelector("#enterStation").classList.toggle("active", data.hallSensorEnterStation);
-        document.querySelector("#startPosition").classList.toggle("active", data.hallSensorStartPosition);
-    } catch (e) {
-        console.warn("ESP niet bereikbaar");
-    }
-}
+        // --- TiltDrop ESP status ---
+        const resTilt = await fetch('/tiltdrop/status');
+        const dataTilt = await resTilt.json();
 
-/* DISPATCH */
-document.querySelectorAll('.js-esp-button').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const target = btn.dataset.target;
-        if(target === 'dispatch'){
-            await fetch(`/dispatch/go`, {
-                method:'POST',
-                headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
-            });
-            updateDispatchStatus();
+        document.querySelector("#tiltdropClosed").classList.toggle("active", dataTilt.closed);
+        document.querySelector("#tiltdropOpen").classList.toggle("active", dataTilt.open);
+        document.querySelector("#coasterOnTiltdrop").classList.toggle("active", dataTilt.coasterOn);
+
+        // --- AUTO TRIGGER TILTDROP ---
+        if(dataStation.currentState === 'RIDING' && dataTilt.closed){
+            await fetch('/tiltdrop/open', { method: 'POST' });
         }
-    });
-});
 
-/* DISPATCH STATUS */
-async function updateDispatchStatus() {
-    try {
-        const response = await fetch('/auto-control/status'); 
-        if (!response.ok) throw new Error('Netwerkfout');
+        if(dataTilt.coasterOn && dataTilt.open){
+            await fetch('/tiltdrop/drop', { method: 'POST' });
+        }
 
-        const data = await response.json();
-        const statusDiv = document.getElementById('dispatch-status');
-
-        statusDiv.style.backgroundColor = data.coasterDispatched ? "green" : "orange";
-        statusDiv.textContent = data.coasterDispatched ? "Coaster dispatched" : "Coaster in station";
-
-    } catch (error) {
-        console.error('Fout bij ophalen status:', error);
-        const statusDiv = document.getElementById('dispatch-status');
-        statusDiv.textContent = 'Fout bij ophalen status';
-        statusDiv.style.backgroundColor = "grey";
+    } catch(e) {
+        console.warn("ESP niet bereikbaar:", e);
     }
 }
 
-/* INTERVALS */
-setInterval(updateStatus, 200);
-setInterval(updateDispatchStatus, 500);
 
+
+    /* DISPATCH */
+    document.querySelectorAll('.js-esp-button').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const target = btn.dataset.target;
+            if (target === 'dispatch') {
+                await fetch(`/dispatch/go`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+                updateDispatchStatus();
+            }
+        });
+    });
+
+    /* DISPATCH STATUS */
+    async function updateDispatchStatus() {
+        try {
+            const response = await fetch('/auto-control/status');
+            if (!response.ok) throw new Error('Netwerkfout');
+
+            const data = await response.json();
+            const statusDiv = document.getElementById('dispatch-status');
+
+            statusDiv.style.backgroundColor = data.coasterDispatched ? "green" : "orange";
+            statusDiv.textContent = data.coasterDispatched ? "Coaster dispatched" : "Coaster in station";
+
+        } catch (error) {
+            console.error('Fout bij ophalen status:', error);
+            const statusDiv = document.getElementById('dispatch-status');
+            statusDiv.textContent = 'Fout bij ophalen status';
+            statusDiv.style.backgroundColor = "grey";
+        }
+    }
+
+    /* INTERVALS */
+    setInterval(updateStatus, 500);
+    setInterval(updateDispatchStatus, 500);
 </script>
 
 <style>
-.rollercoaster-interface {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding-top: 50px;
-}
+    .rollercoaster-interface {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding-top: 50px;
+    }
 
-.visual-coaster {
-    position: relative;
-    width: 404px;
-    height: 175px;
-    margin-bottom: 30px;
-}
+    .visual-coaster {
+        position: relative;
+        width: 404px;
+        height: 175px;
+        margin-bottom: 30px;
+    }
 
-.station {
-    width: 300px;
-    height: 50px;
-    border: 2px solid black;
-    position: relative;
-    z-index: 10;
-    background-color: white;
-}
+    .station {
+        width: 300px;
+        height: 50px;
+        border: 2px solid black;
+        position: relative;
+        z-index: 10;
+        background-color: white;
+    }
 
-.track {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-    padding: 0 10px;
-    position: relative;
-}
-.track::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background-color: black;
-    transform: translateY(-50%);
-    z-index: 1;
-}
+    .track {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        padding: 0 10px;
+        position: relative;
+    }
 
-.sensor {
-    width: 20px;
-    height: 20px;
-    background-color: gray;
-    border-radius: 50%;
-    z-index: 2;
-    position: relative;
-}
-.sensor.active { background-color: limegreen; }
+    .track::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background-color: black;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
 
-.outside-all {
-    position: absolute;
-    left: 304px;
-    top: 25px;
-    width: 100px;
-    height: 200px;
-    z-index: 5;
-}
-.outside-path { position: absolute; top: -2; left: -5; z-index: 1; }
-.outside-track { position: absolute; left: calc(50px - 15px); top: calc(150px - 12px); z-index: 2; }
+    .sensor {
+        width: 20px;
+        height: 20px;
+        background-color: gray;
+        border-radius: 50%;
+        z-index: 2;
+        position: relative;
+    }
+
+    .sensor.active {
+        background-color: limegreen;
+    }
+
+    #bottomLifthill {
+        margin-top: -100px;
+    }
+
+    .outside-all {
+        position: absolute;
+        left: 304px;
+        top: 25px;
+        width: 100px;
+        height: 200px;
+        z-index: 5;
+    }
+
+    .outside-path {
+        position: absolute;
+        top: -2px;
+        left: -5px;
+        z-index: 1;
+    }
+
+    .outside-track {
+        position: absolute;
+        left: calc(50px - 15px);
+        top: calc(150px - 12px);
+        z-index: 2;
+    }
 
 
-#dispatch-status {
-    margin-top: 10px;
-    padding: 5px 10px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    background-color: gray;
-    min-width: 200px;
-}
+    #dispatch-status {
+        margin-top: 10px;
+        padding: 5px 10px;
+        font-weight: bold;
+        color: white;
+        text-align: center;
+        background-color: gray;
+        min-width: 200px;
+    }
 </style>

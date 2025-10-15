@@ -15,9 +15,10 @@ Route::get('/', function () {
 Route::get('/manual-control', [ManualControlController::class, 'index'])->name('manual-control.index');
 
 Route::post('/led/{state}', [ManualControlController::class, 'ledControl']);
-Route::post('/stationmotor/{state}', [ManualControlController::class, 'stationMotorControl']);
-Route::post('/lifthillmotor/{state}', [ManualControlController::class, 'lifthillMotorControl']);
+Route::post('/manual/stationmotor/{state}', [ManualControlController::class, 'stationMotorControl']);
+Route::post('/manual/lifthillmotor/{state}', [ManualControlController::class, 'lifthillMotorControl']);
 Route::get('/manual-control/status', [ManualControlController::class, 'status']);
+Route::get('/manual/{state}', [ManualControlController::class, 'manualMode']);
 
 
 //AutoControlController
@@ -26,15 +27,8 @@ Route::get('/auto-control', [AutoControlController::class, 'index'])->name('auto
 Route::post('/dispatch/go', [AutoControlController::class, 'dispatchControl']);
 Route::get('/auto-control/status', [AutoControlController::class, 'status']);
 
-
-//TESTING
-Route::get('/test', [TestController::class, 'index'])->name('test.index');
-// proxy routes naar ESP
-Route::get('/esp/status', [TestController::class, 'status']);
-Route::post('/esp/manual/on', [TestController::class, 'manualOn']);
-Route::post('/esp/manual/off', [TestController::class, 'manualOff']);
-Route::post('/esp/manual/station/on', [TestController::class, 'stationMotorOn']);
-Route::post('/esp/manual/station/off', [TestController::class, 'stationMotorOff']);
-Route::post('/esp/manual/lifthill/on', [TestController::class, 'lifthillMotorOn']);
-Route::post('/esp/manual/lifthill/off', [TestController::class, 'lifthillMotorOff']);
-Route::post('/esp/dispatch/go', [TestController::class, 'dispatchGo']);
+// TiltDrop routes via AutoControlController
+Route::post('/tiltdrop/open', [AutoControlController::class, 'tiltdropOpen']);
+Route::post('/tiltdrop/close', [AutoControlController::class, 'tiltdropClose']);
+Route::post('/tiltdrop/drop', [AutoControlController::class, 'tiltdropDrop']);
+Route::get('/tiltdrop/status', [AutoControlController::class, 'tiltdropStatus']);

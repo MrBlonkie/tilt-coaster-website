@@ -13,10 +13,12 @@ Route::get('/', function () {
 
 //ManualControlController
 Route::get('/manual-control', [ManualControlController::class, 'index'])->name('manual-control.index');
-
-Route::post('/led/{state}', [ManualControlController::class, 'ledControl']);
+//motors
 Route::post('/manual/stationmotor/{state}', [ManualControlController::class, 'stationMotorControl']);
 Route::post('/manual/lifthillmotor/{state}', [ManualControlController::class, 'lifthillMotorControl']);
+Route::post('/manual/tiltdropmotor/{state}', [ManualControlController::class, 'tiltdropMotorControl']);
+Route::post('/manual/releasedropmotor/{state}', [ManualControlController::class, 'releasedropMotorControl']);
+//other
 Route::get('/manual-control/status', [ManualControlController::class, 'status']);
 Route::get('/manual/{state}', [ManualControlController::class, 'manualMode']);
 

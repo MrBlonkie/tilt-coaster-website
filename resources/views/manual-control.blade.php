@@ -24,6 +24,26 @@
     <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
 </x-control-card>
 
+{{-- TILTDROP MOTOR --}}
+<x-control-card showStatus class="max-w-md mx-auto mt-4">
+    <p class="text-gray-500 text-sm">TILTDROP MOTOR</p>
+    <x-slot name="buttons">
+        <x-esp-button class="js-esp-button" data-target="tiltdropmotor" data-action="open">OPEN</x-esp-button>
+        <x-esp-button class="js-esp-button" data-target="tiltdropmotor" data-action="close">CLOSE</x-esp-button>
+    </x-slot>
+    <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+</x-control-card>
+
+{{-- RELEASEDROP MOTOR --}}
+<x-control-card showStatus class="max-w-md mx-auto mt-4">
+    <p class="text-gray-500 text-sm">RELEASEDROP MOTOR</p>
+    <x-slot name="buttons">
+        <x-esp-button class="js-esp-button" data-target="releasedropmotor" data-action="open">OPEN</x-esp-button>
+        <x-esp-button class="js-esp-button" data-target="releasedropmotor" data-action="close">CLOSE</x-esp-button>
+    </x-slot>
+    <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+</x-control-card>
+
 <script>
 let updateInterval = null;
 
@@ -41,6 +61,12 @@ document.querySelectorAll('.js-esp-button').forEach(btn => {
                 break;
             case 'lifthillmotor':
                 postLiftMotor(action);
+                break;
+            case 'tiltdropmotor':
+                postTiltDropMotor(action);
+                break;
+            case 'releasedropmotor':
+                postReleaseDropMotor(action);
                 break;
         }
     });
@@ -63,8 +89,8 @@ async function updateStationMotorStatus() {
         const data = await response.json();
         const statusDiv = document.getElementById('stationmotor-status');
 
-        statusDiv.style.backgroundColor = data.stationMotorManual ? "green" : "red";
-        statusDiv.textContent = data.stationMotorManual ? "Motor draait" : "Motor staat stil";
+        statusDiv.style.backgroundColor = data.station.stationMotorManual ? "green" : "red";
+        statusDiv.textContent = data.station.stationMotorManual ? "Motor draait" : "Motor staat stil";
 
     } catch (error) {
         console.error('Fout bij ophalen status:', error);
@@ -90,8 +116,62 @@ async function updateLifthillMotorStatus() {
         const data = await response.json();
         const statusDiv = document.getElementById('lifthillmotor-status');
 
-        statusDiv.style.backgroundColor = data.liftMotorManual ? "green" : "red";
-        statusDiv.textContent = data.liftMotorManual ? "Motor draait" : "Motor staat stil";
+        statusDiv.style.backgroundColor = data.station.liftMotorManual ? "green" : "red";
+        statusDiv.textContent = data.station.liftMotorManual ? "Motor draait" : "Motor staat stil";
+
+    } catch (error) {
+        console.error('Fout bij ophalen status:', error);
+        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
+        document.getElementById('led-status').style.backgroundColor = "grey";
+    }
+}
+
+// TILTDROP MOTOR
+async function postTiltDropMotor(state){
+    await fetch(`/manual/tiltdropmotor/${state}`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
+    });
+    updateTiltDropMotorStatus();
+}
+
+async function updateTiltDropMotorStatus() {
+    try {
+        const response = await fetch('/auto-control/status'); 
+        if (!response.ok) throw new Error('Netwerkfout');
+
+        const data = await response.json();
+        const statusDiv = document.getElementById('tiltdropmotor-status');
+
+        statusDiv.style.backgroundColor = data.tiltdrop.tiltdropMotorManual ? "green" : "red";
+        statusDiv.textContent = data.tiltdrop.tiltdropMotorManual ? "Motor draait" : "Motor staat stil";
+
+    } catch (error) {
+        console.error('Fout bij ophalen status:', error);
+        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
+        document.getElementById('led-status').style.backgroundColor = "grey";
+    }
+}
+
+// RELEASEDROP MOTOR
+async function postReleaseDropMotor(state){
+    await fetch(`/manual/releasedropmotor/${state}`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
+    });
+    updateReleaseDropMotorStatus();
+}
+
+async function updateReleaseDropMotorStatus() {
+    try {
+        const response = await fetch('/auto-control/status'); 
+        if (!response.ok) throw new Error('Netwerkfout');
+
+        const data = await response.json();
+        const statusDiv = document.getElementById('releasedropmotor-status');
+
+        statusDiv.style.backgroundColor = data.tiltdrop.releasedropMotorManual ? "green" : "red";
+        statusDiv.textContent = data.tiltdrop.releasedropMotorManual ? "Motor draait" : "Motor staat stil";
 
     } catch (error) {
         console.error('Fout bij ophalen status:', error);
@@ -105,9 +185,13 @@ document.getElementById('monitoring').addEventListener('change', function(e) {
     if (e.target.checked) {
         updateStationMotorStatus();
         updateLifthillMotorStatus();
+        updateTiltDropMotorStatus();
+        updateReleaseDropMotorStatus();
         updateInterval = setInterval(() => {
             updateStationMotorStatus();
             updateLifthillMotorStatus();
+            updateTiltDropMotorStatus();
+            updateReleaseDropMotorStatus();
 
         }, 500);
     } else {
@@ -125,7 +209,7 @@ document.getElementById('manual-switch').addEventListener('change', async functi
     const state = e.target.checked ? 'on' : 'off';
 
     try {
-        const response = await fetch(`/manual/${state}`); // <-- GEEN POST, gewoon GET
+        const response = await fetch(`/manual/${state}`);
         if (!response.ok) throw new Error('Fout bij verzenden manual mode');
 
         const data = await response.json();

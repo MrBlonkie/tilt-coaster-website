@@ -1,5 +1,7 @@
 <x-layout>
 
+    <x-toggle name="monitoring" id="monitoring">monitoring</x-toggle>
+
     <div class="rollercoaster-interface">
 
         <!-- VISUELE BAAN -->
@@ -46,40 +48,46 @@
 <script>
     /* UPDATE SENSOR + MODE/STATE STATUS */
     async function updateStatus() {
-    try {
-        // --- Station ESP status ---
-        const resStation = await fetch('/auto-control/status');
-        const dataStation = await resStation.json();
-        document.querySelector("#state").textContent = dataStation.currentState;
-        document.querySelector("#mode").textContent = dataStation.manualMode ? "Manual" : "Auto";
+        try {
+            // --- Station ESP status ---
+            const resStation = await fetch('/auto-control/status');
+            const dataStation = await resStation.json();
+            document.querySelector("#state").textContent = dataStation.currentState;
+            document.querySelector("#mode").textContent = dataStation.manualMode ? "Manual" : "Auto";
 
-        document.querySelector("#exitStation").classList.toggle("active", dataStation.hallSensorExitStation);
-        document.querySelector("#bottomLifthill").classList.toggle("active", dataStation.hallSensorBottomLifthill);
-        document.querySelector("#topLifthill").classList.toggle("active", dataStation.hallSensorTopLifthill);
-        document.querySelector("#enterStation").classList.toggle("active", dataStation.hallSensorEnterStation);
-        document.querySelector("#startPosition").classList.toggle("active", dataStation.hallSensorStartPosition);
+            document.querySelector("#exitStation").classList.toggle("active", dataStation.hallSensorExitStation);
+            document.querySelector("#bottomLifthill").classList.toggle("active", dataStation
+                .hallSensorBottomLifthill);
+            document.querySelector("#topLifthill").classList.toggle("active", dataStation.hallSensorTopLifthill);
+            document.querySelector("#enterStation").classList.toggle("active", dataStation.hallSensorEnterStation);
+            document.querySelector("#startPosition").classList.toggle("active", dataStation
+            .hallSensorStartPosition);
 
-        // --- TiltDrop ESP status ---
-        const resTilt = await fetch('/tiltdrop/status');
-        const dataTilt = await resTilt.json();
+            // --- TiltDrop ESP status ---
+            const resTilt = await fetch('/tiltdrop/status');
+            const dataTilt = await resTilt.json();
 
-        document.querySelector("#tiltdropClosed").classList.toggle("active", dataTilt.closed);
-        document.querySelector("#tiltdropOpen").classList.toggle("active", dataTilt.open);
-        document.querySelector("#coasterOnTiltdrop").classList.toggle("active", dataTilt.coasterOn);
+            document.querySelector("#tiltdropClosed").classList.toggle("active", dataTilt.closed);
+            document.querySelector("#tiltdropOpen").classList.toggle("active", dataTilt.open);
+            document.querySelector("#coasterOnTiltdrop").classList.toggle("active", dataTilt.coasterOn);
 
-        // --- AUTO TRIGGER TILTDROP ---
-        if(dataStation.currentState === 'RIDING' && dataTilt.closed){
-            await fetch('/tiltdrop/open', { method: 'POST' });
+            // --- AUTO TRIGGER TILTDROP ---
+            if (dataStation.currentState === 'RIDING' && dataTilt.closed) {
+                await fetch('/tiltdrop/open', {
+                    method: 'POST'
+                });
+            }
+
+            if (dataTilt.coasterOn && dataTilt.open) {
+                await fetch('/tiltdrop/drop', {
+                    method: 'POST'
+                });
+            }
+
+        } catch (e) {
+            console.warn("ESP niet bereikbaar:", e);
         }
-
-        if(dataTilt.coasterOn && dataTilt.open){
-            await fetch('/tiltdrop/drop', { method: 'POST' });
-        }
-
-    } catch(e) {
-        console.warn("ESP niet bereikbaar:", e);
     }
-}
 
 
 
@@ -120,9 +128,27 @@
         }
     }
 
-    /* INTERVALS */
-    setInterval(updateStatus, 500);
-    setInterval(updateDispatchStatus, 500);
+
+
+    // toggle monitoring aan/uit
+    document.getElementById('monitoring').addEventListener('change', function(e) {
+        if (e.target.checked) {
+            updateStatus();
+            updateDispatchStatus();
+            updateInterval = setInterval(() => {
+                updateStatus();
+                updateDispatchStatus();
+
+            }, 500);
+        } else {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
+    });
+
+    window.addEventListener('beforeunload', () => {
+        if (updateInterval) clearInterval(updateInterval);
+    });
 </script>
 
 <style>

@@ -1,242 +1,110 @@
 <x-layout>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
-<x-toggle name="monitoring" id="monitoring">monitoring</x-toggle>
+    <x-toggle name="manual-switch-station" id="manual-switch-station">manual switch station</x-toggle>
+    <x-toggle name="manual-switch-tiltdrop" id="manual-switch-tiltdrop">manual switch tiltdrop</x-toggle>
 
-<x-toggle name="manual-switch" id="manual-switch">manual switch</x-toggle>
+    {{-- STATION MOTOR --}}
+    <x-control-card showStatus class="max-w-md mx-auto mt-4">
+        <p class="text-gray-500 text-sm">STATION MOTOR</p>
+        <x-slot name="buttons">
+            <x-esp-button class="js-esp-button" data-target="stationmotor" data-action="on">ON</x-esp-button>
+            <x-esp-button class="js-esp-button" data-target="stationmotor" data-action="off">OFF</x-esp-button>
+        </x-slot>
+        <div id="stationmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+    </x-control-card>
 
-{{-- STATION MOTOR --}}
-<x-control-card showStatus class="max-w-md mx-auto mt-4">
-    <p class="text-gray-500 text-sm">STATION MOTOR</p>
-    <x-slot name="buttons">
-        <x-esp-button class="js-esp-button" data-target="stationmotor" data-action="on">ON</x-esp-button>
-        <x-esp-button class="js-esp-button" data-target="stationmotor" data-action="off">OFF</x-esp-button>
-    </x-slot>
-    <div id="stationmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
-</x-control-card>
+    {{-- LIFTHILL MOTOR --}}
+    <x-control-card showStatus class="max-w-md mx-auto mt-4">
+        <p class="text-gray-500 text-sm">LIFTHILL MOTOR</p>
+        <x-slot name="buttons">
+            <x-esp-button class="js-esp-button" data-target="lifthillmotor" data-action="on">ON</x-esp-button>
+            <x-esp-button class="js-esp-button" data-target="lifthillmotor" data-action="off">OFF</x-esp-button>
+        </x-slot>
+        <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+    </x-control-card>
 
-{{-- LIFTHILL MOTOR --}}
-<x-control-card showStatus class="max-w-md mx-auto mt-4">
-    <p class="text-gray-500 text-sm">LIFTHILL MOTOR</p>
-    <x-slot name="buttons">
-        <x-esp-button class="js-esp-button" data-target="lifthillmotor" data-action="on">ON</x-esp-button>
-        <x-esp-button class="js-esp-button" data-target="lifthillmotor" data-action="off">OFF</x-esp-button>
-    </x-slot>
-    <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
-</x-control-card>
+    {{-- TILTDROP MOTOR --}}
+    <x-control-card showStatus class="max-w-md mx-auto mt-4">
+        <p class="text-gray-500 text-sm">TILTDROP MOTOR</p>
+        <x-slot name="buttons">
+            <x-esp-button class="js-esp-button" data-target="tiltdropmotor" data-action="open">OPEN</x-esp-button>
+            <x-esp-button class="js-esp-button" data-target="tiltdropmotor" data-action="close">CLOSE</x-esp-button>
+        </x-slot>
+        <div id="tiltdropmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+    </x-control-card>
 
-{{-- TILTDROP MOTOR --}}
-<x-control-card showStatus class="max-w-md mx-auto mt-4">
-    <p class="text-gray-500 text-sm">TILTDROP MOTOR</p>
-    <x-slot name="buttons">
-        <x-esp-button class="js-esp-button" data-target="tiltdropmotor" data-action="open">OPEN</x-esp-button>
-        <x-esp-button class="js-esp-button" data-target="tiltdropmotor" data-action="close">CLOSE</x-esp-button>
-    </x-slot>
-    <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
-</x-control-card>
+    {{-- RELEASEDROP MOTOR --}}
+    <x-control-card showStatus class="max-w-md mx-auto mt-4">
+        <p class="text-gray-500 text-sm">RELEASEDROP MOTOR</p>
+        <x-slot name="buttons">
+            <x-esp-button class="js-esp-button" data-target="releasedropmotor" data-action="open">OPEN</x-esp-button>
+            <x-esp-button class="js-esp-button" data-target="releasedropmotor" data-action="close">CLOSE</x-esp-button>
+        </x-slot>
+        <div id="releasedropmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
+    </x-control-card>
 
-{{-- RELEASEDROP MOTOR --}}
-<x-control-card showStatus class="max-w-md mx-auto mt-4">
-    <p class="text-gray-500 text-sm">RELEASEDROP MOTOR</p>
-    <x-slot name="buttons">
-        <x-esp-button class="js-esp-button" data-target="releasedropmotor" data-action="open">OPEN</x-esp-button>
-        <x-esp-button class="js-esp-button" data-target="releasedropmotor" data-action="close">CLOSE</x-esp-button>
-    </x-slot>
-    <div id="lifthillmotor-status" class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
-</x-control-card>
+    <script>
+        const client = mqtt.connect('ws://10.11.171.126:9001');
 
-<script>
-let updateInterval = null;
+        client.on('connect', () => {
+            console.log('MQTT connected!');
 
-document.querySelectorAll('.js-esp-button').forEach(btn => {
+            // Subscribe to motor status topics
+            client.subscribe('station/status', err => {
+                if (!err) console.log('Subscribed to station/status');
+            });
+            client.subscribe('tiltdrop/status', err => {
+                if (!err) console.log('Subscribed to tiltdrop/status');
+            });
+        });
+
+        // Update status in frontend
+        client.on('message', (topic, payload) => {
+            const message = payload.toString();
+            try {
+                const status = JSON.parse(message);
+                document.getElementById('stationmotor-status').innerText = status.stationMotorManual ? 'ON' : 'OFF';
+                document.getElementById('lifthillmotor-status').innerText = status.liftMotorManual ? 'ON' : 'OFF';
+                document.getElementById('tiltdropmotor-status').innerText = status.tiltdropMotorState ? 'OPEN' :
+                    'CLOSE';
+                document.getElementById('releasedropmotor-status').innerText = status.releasedropMotorState ?
+                    'OPEN' : 'CLOSE';
+            } catch (e) {
+                console.error('Invalid JSON', e);
+            }
+        });
+
+        // Manual toggle publishes to station/manual
+        const manualToggle = document.getElementById('manual-switch-station');
+        manualToggle.addEventListener('change', () => {
+            const msg = manualToggle.checked ? 'on' : 'off';
+            client.publish('station/manual', msg);
+        });
+
+        // Manual toggle publishes to tiltdrop/manual
+        const manualToggle1 = document.getElementById('manual-switch-tiltdrop');
+        manualToggle1.addEventListener('change', () => {
+            const msg = manualToggle1.checked ? 'on' : 'off';
+            client.publish('tiltdrop/manual', msg);
+        });
+
+        document.querySelectorAll('.js-esp-button').forEach(btn => {
     btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
+        const target = btn.dataset.target; 
         const action = btn.dataset.action;
 
-        switch(target){
-            case 'led':
-                postLed(action);
-                break;
-            case 'stationmotor':
-                postStationMotor(action);
-                break;
-            case 'lifthillmotor':
-                postLiftMotor(action);
-                break;
-            case 'tiltdropmotor':
-                postTiltDropMotor(action);
-                break;
-            case 'releasedropmotor':
-                postReleaseDropMotor(action);
-                break;
+        let topic;
+        if(target === 'stationmotor' || target === 'lifthillmotor') {
+            topic = `station/${target}`;
+        } else if(target === 'tiltdropmotor' || target === 'releasedropmotor') {
+            topic = `tiltdrop/${target}`; // past bij jouw ESP code
         }
+
+        client.publish(topic, action);
     });
 });
 
-// STATION MOTOR
-async function postStationMotor(state){
-    await fetch(`/manual/stationmotor/${state}`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
-    });
-    updateStationMotorStatus();
-}
 
-async function updateStationMotorStatus() {
-    try {
-        const response = await fetch('/auto-control/status'); 
-        if (!response.ok) throw new Error('Netwerkfout');
-
-        const data = await response.json();
-        const statusDiv = document.getElementById('stationmotor-status');
-
-        statusDiv.style.backgroundColor = data.station.stationMotorManual ? "green" : "red";
-        statusDiv.textContent = data.station.stationMotorManual ? "Motor draait" : "Motor staat stil";
-
-    } catch (error) {
-        console.error('Fout bij ophalen status:', error);
-        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
-        document.getElementById('led-status').style.backgroundColor = "grey";
-    }
-}
-
-// LIFTHILL MOTOR
-async function postLiftMotor(state){
-    await fetch(`/manual/lifthillmotor/${state}`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
-    });
-    updateLifthillMotorStatus();
-}
-
-async function updateLifthillMotorStatus() {
-    try {
-        const response = await fetch('/auto-control/status'); 
-        if (!response.ok) throw new Error('Netwerkfout');
-
-        const data = await response.json();
-        const statusDiv = document.getElementById('lifthillmotor-status');
-
-        statusDiv.style.backgroundColor = data.station.liftMotorManual ? "green" : "red";
-        statusDiv.textContent = data.station.liftMotorManual ? "Motor draait" : "Motor staat stil";
-
-    } catch (error) {
-        console.error('Fout bij ophalen status:', error);
-        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
-        document.getElementById('led-status').style.backgroundColor = "grey";
-    }
-}
-
-// TILTDROP MOTOR
-async function postTiltDropMotor(state){
-    await fetch(`/manual/tiltdropmotor/${state}`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
-    });
-    updateTiltDropMotorStatus();
-}
-
-async function updateTiltDropMotorStatus() {
-    try {
-        const response = await fetch('/auto-control/status'); 
-        if (!response.ok) throw new Error('Netwerkfout');
-
-        const data = await response.json();
-        const statusDiv = document.getElementById('tiltdropmotor-status');
-
-        statusDiv.style.backgroundColor = data.tiltdrop.tiltdropMotorManual ? "green" : "red";
-        statusDiv.textContent = data.tiltdrop.tiltdropMotorManual ? "Motor draait" : "Motor staat stil";
-
-    } catch (error) {
-        console.error('Fout bij ophalen status:', error);
-        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
-        document.getElementById('led-status').style.backgroundColor = "grey";
-    }
-}
-
-// RELEASEDROP MOTOR
-async function postReleaseDropMotor(state){
-    await fetch(`/manual/releasedropmotor/${state}`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
-    });
-    updateReleaseDropMotorStatus();
-}
-
-async function updateReleaseDropMotorStatus() {
-    try {
-        const response = await fetch('/auto-control/status'); 
-        if (!response.ok) throw new Error('Netwerkfout');
-
-        const data = await response.json();
-        const statusDiv = document.getElementById('releasedropmotor-status');
-
-        statusDiv.style.backgroundColor = data.tiltdrop.releasedropMotorManual ? "green" : "red";
-        statusDiv.textContent = data.tiltdrop.releasedropMotorManual ? "Motor draait" : "Motor staat stil";
-
-    } catch (error) {
-        console.error('Fout bij ophalen status:', error);
-        document.getElementById('led-status-text').textContent = 'Fout bij ophalen status';
-        document.getElementById('led-status').style.backgroundColor = "grey";
-    }
-}
-
-// toggle monitoring aan/uit
-document.getElementById('monitoring').addEventListener('change', function(e) {
-    if (e.target.checked) {
-        updateStationMotorStatus();
-        updateLifthillMotorStatus();
-        updateTiltDropMotorStatus();
-        updateReleaseDropMotorStatus();
-        updateInterval = setInterval(() => {
-            updateStationMotorStatus();
-            updateLifthillMotorStatus();
-            updateTiltDropMotorStatus();
-            updateReleaseDropMotorStatus();
-
-        }, 500);
-    } else {
-        clearInterval(updateInterval);
-        updateInterval = null;
-    }
-});
-
-window.addEventListener('beforeunload', () => {
-    if (updateInterval) clearInterval(updateInterval);
-});
-
-// toggle manual mode aan/uit
-document.getElementById('manual-switch').addEventListener('change', async function(e) {
-    const state = e.target.checked ? 'on' : 'off';
-
-    try {
-        const response = await fetch(`/manual/${state}`);
-        if (!response.ok) throw new Error('Fout bij verzenden manual mode');
-
-        const data = await response.json();
-        console.log('Manual mode:', data);
-
-        // Optioneel: UI feedback
-        const text = e.target.checked ? 'Manual mode ingeschakeld' : 'Manual mode uitgeschakeld';
-        console.log(text);
-    } catch (error) {
-        console.error('Fout bij togglen manual mode:', error);
-    }
-});
-
-
-async function updateManualToggle() {
-    try {
-        const response = await fetch('/auto-control/status');
-        const data = await response.json();
-        document.getElementById('manual-switch').checked = data.manualMode;
-    } catch (err) {
-        console.error('Kon manual status niet ophalen:', err);
-    }
-}
-
-// aanroepen bij paginalaad
-updateManualToggle();
-
-</script>
-
+    </script>
 </x-layout>

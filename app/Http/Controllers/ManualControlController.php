@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use App\Models\MqttMessage;
 
 class ManualControlController extends Controller
 {
@@ -18,72 +20,21 @@ class ManualControlController extends Controller
 
     public function index()
     {
-        return view('manual-control');
-    }
+        $stationJson = Cache::get('mqtt_last_station/status');
+        $tiltdropJson = Cache::get('mqtt_last_tiltdrop/status');
 
-    public function ledControl($state)
-    {
-        $response = Http::post("http://{$this->espStationIp}/led/{$state}");
-        return response()->json($response->json());
-    }
-
-    public function stationMotorControl($state)
-    {
-        $response = Http::post("http://{$this->espStationIp}/manual/stationmotor/{$state}");
-        return response()->json($response->json());
-    }
-
-    public function lifthillMotorControl($state)
-    {
-        $response = Http::post("http://{$this->espStationIp}/manual/lifthillmotor/{$state}");
-        return response()->json($response->json());
-    }
-
-    public function tiltdropMotorControl($state)
-    {
-        $response = Http::post("http://{$this->espTiltDropIp}/manual/tiltdropmotor/{$state}");
-        return response()->json($response->json());
-    }
-
-    public function releasedropMotorControl($state)
-    {
-        $response = Http::post("http://{$this->espTiltDropIp}/manual/releasedropmotor/{$state}");
-        return response()->json($response->json());
-    }
-
-    public function status()
-    {
-        try {
-            $stationResponse = Http::timeout(1)->get("http://{$this->espStationIp}/auto-control/status")->json();
-        } catch (\Exception $e) {
-            $stationResponse = ['error' => 'Station ESP niet bereikbaar'];
+        if (!$stationJson) {
+            $stationJson = MqttMessage::where('topic', 'station/status')->latest()->value('message');
+        }
+        if (!$tiltdropJson) {
+            $tiltdropJson = MqttMessage::where('topic', 'tiltdrop/status')->latest()->value('message');
         }
 
-        try {
-            $tiltdropResponse = Http::timeout(1)->get("http://{$this->espTiltDropIp}/auto-control/status")->json();
-        } catch (\Exception $e) {
-            $tiltdropResponse = ['error' => 'Tiltdrop ESP niet bereikbaar'];
-        }
+        $station = $stationJson ? json_decode($stationJson, true) : null;
+        $tiltdrop = $tiltdropJson ? json_decode($tiltdropJson, true) : null;
 
-        return response()->json([
-            'station' => $stationResponse,
-            'tiltdrop' => $tiltdropResponse,
-        ]);
+        return view('manual-control', compact('station', 'tiltdrop'));
     }
-
-
-    public function manualMode($state)
-    {
-        $stationResponse = Http::get("http://{$this->espStationIp}/manual/{$state}");
-        $tiltdropResponse = Http::get("http://{$this->espTiltDropIp}/manual/{$state}");
-
-        return response()->json([
-            'station' => $stationResponse->json(),
-            'tiltdrop' => $tiltdropResponse->json(),
-        ]);
-    }
-
-
 
 }
 

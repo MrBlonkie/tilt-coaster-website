@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 class MqttListener extends Command
 {
     protected $signature = 'mqtt:listen';
-    protected $description = 'Listen to MQTT topics and cache latest messages';
+    protected $description = 'Listen to MQTT topics and cache latest messages, including LWT';
 
     public function handle()
     {
@@ -31,17 +31,32 @@ class MqttListener extends Command
         $mqtt->connect($connectionSettings, $clean_session);
         $this->info("MQTT client connected");
 
-        // Abonneer enkel op de twee topics die je nodig hebt
-        $topics = ['station/status', 'tiltdrop/status'];
+        // Luister naar ALLE topics die relevant zijn
+        $topics = [
+            'station/status',
+            'tiltdrop/status',
+            'rollercoaster/station/status',
+            'rollercoaster/tiltdrop/status',
+        ];
 
         foreach ($topics as $topic) {
             $mqtt->subscribe($topic, function ($topic, $message) {
                 $this->info("Received message on [$topic]: $message");
 
-                // Cache het laatste bericht per topic
-                Cache::put("mqtt_last_{$topic}", $message, now()->addHours(6));
+                // --- 1. Detecteer LWT berichten ---
+                if (str_starts_with($topic, 'rollercoaster/')) {
+                    // Cache LWT status apart
+                    Cache::put("mqtt_lwt_" . str_replace('/', '_', $topic), $message, now()->addMinutes(10));
+                    $this->info("→ LWT cached as mqtt_lwt_" . str_replace('/', '_', $topic));
+                }
 
-                // Log optioneel naar DB
+                // --- 2. Cache gewone status JSON ---
+                else {
+                    Cache::put("mqtt_last_" . str_replace('/', '_', $topic), $message, now()->addHours(6));
+                    $this->info("→ Status cached as mqtt_last_" . str_replace('/', '_', $topic));
+                }
+
+                // --- 3. Optioneel loggen in DB ---
                 MqttMessage::create([
                     'topic' => $topic,
                     'message' => $message

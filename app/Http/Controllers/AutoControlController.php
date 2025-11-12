@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use App\Models\MqttMessage;
+
 class AutoControlController extends Controller
 {
     private $espStationIp;
@@ -19,27 +19,27 @@ class AutoControlController extends Controller
 
     public function index()
     {
-        $stationJson = Cache::get('mqtt_last_station/status');
-        $tiltdropJson = Cache::get('mqtt_last_tiltdrop/status');
-        
-        // === HEARTBEAT AANPASSING START ===
-        // De status ('online'/'offline') wordt nu volledig door de frontend (browser) beheerd
-        // met behulp van de Heartbeat-timer. We zetten de initiële waarden op 'unknown'.
-        $stationOnline = 'unknown';
-        $tiltdropOnline = 'unknown';
-        // === HEARTBEAT AANPASSING EIND ===
+        $stationJson   = Cache::get('mqtt_last_station/status') ?? MqttMessage::where('topic', 'station/status')->latest()->value('message');
+        $tiltdropJson  = Cache::get('mqtt_last_tiltdrop/status') ?? MqttMessage::where('topic', 'tiltdrop/status')->latest()->value('message');
 
+        // === Alleen valide JSON decoden ===
+        $station  = $this->isJson($stationJson) ? json_decode($stationJson, true) : null;
+        $tiltdrop = $this->isJson($tiltdropJson) ? json_decode($tiltdropJson, true) : null;
 
-        if (!$stationJson) {
-            $stationJson = MqttMessage::where('topic', 'station/status')->latest()->value('message');
-        }
-        if (!$tiltdropJson) {
-            $tiltdropJson = MqttMessage::where('topic', 'tiltdrop/status')->latest()->value('message');
-        }
-
-        $station = $stationJson ? json_decode($stationJson, true) : null;
-        $tiltdrop = $tiltdropJson ? json_decode($tiltdropJson, true) : null;
+        // === Heartbeat initiële status voor frontend ===
+        $stationOnline   = 'unknown';
+        $tiltdropOnline  = 'unknown';
 
         return view('auto-control', compact('station', 'tiltdrop', 'stationOnline', 'tiltdropOnline'));
+    }
+
+    /**
+     * Check of een string valide JSON is
+     */
+    private function isJson(?string $string): bool
+    {
+        if (!$string) return false;
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }

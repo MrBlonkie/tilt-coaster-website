@@ -20,7 +20,7 @@
                             {{ request()->is('/') ? 'underline text-[var(--color-accent)]' : 'text-[var(--color-accent)] hover:text-[var(--color-highlight)]' }} 
                             dark:text-[var(--color-secondary)] 
                             dark:hover:text-[var(--color-highlight)]">
-                            Home
+                            Dashboard
                         </a>
                     </li>
 

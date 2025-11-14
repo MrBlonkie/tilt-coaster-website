@@ -152,7 +152,8 @@
         const HEARTBEAT_TIMEOUT = 5000; // 5 seconden
 
         // === MQTT CLIENT SETUP ===
-        const client = mqtt.connect('ws://10.11.171.126:9001');
+        const MQTT_HOST = "{{ env('PI_IP') }}";
+        const client = mqtt.connect(`ws://${MQTT_HOST}:9001`);
 
         client.on('connect', () => {
             console.log('MQTT connected!');
@@ -170,77 +171,77 @@
         });
 
         client.on('message', (topic, payload) => {
-    const msg = payload.toString().trim();
+            const msg = payload.toString().trim();
 
-    // === LWT / HEARTBEAT ===
-    if (topic === 'rollercoaster/station/status') {
-        if (msg.toLowerCase() === 'online') lastStationHeartbeat = Date.now();
-        setConnectStatus('station', 'online');
-        return;
-    }
-    if (topic === 'rollercoaster/tiltdrop/status') {
-        if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
-        setConnectStatus('tiltdrop', 'online');
-        return;
-    }
+            // === LWT / HEARTBEAT ===
+            if (topic === 'rollercoaster/station/status') {
+                if (msg.toLowerCase() === 'online') lastStationHeartbeat = Date.now();
+                setConnectStatus('station', 'online');
+                return;
+            }
+            if (topic === 'rollercoaster/tiltdrop/status') {
+                if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
+                setConnectStatus('tiltdrop', 'online');
+                return;
+            }
 
-    if (topic === 'rollercoaster/event') {
-        appendLogMessage(msg);
-        return;
-    }
+            if (topic === 'rollercoaster/event') {
+                appendLogMessage(msg);
+                return;
+            }
 
-    // === STATUS BERICHT (JSON only) ===
-    let data;
-    try {
-        data = JSON.parse(msg);
-    } catch (e) {
-        // Niet-JSON (bijv. heartbeat strings) negeren
-        return;
-    }
+            // === STATUS BERICHT (JSON only) ===
+            let data;
+            try {
+                data = JSON.parse(msg);
+            } catch (e) {
+                // Niet-JSON (bijv. heartbeat strings) negeren
+                return;
+            }
 
-    if (topic === 'station/status') updateStationUI(data);
-    if (topic === 'tiltdrop/status') updateTiltdropUI(data);
-});
+            if (topic === 'station/status') updateStationUI(data);
+            if (topic === 'tiltdrop/status') updateTiltdropUI(data);
+        });
 
-function updateStationUI(data) {
-    if (!data) return;
+        function updateStationUI(data) {
+            if (!data) return;
 
-    document.getElementById('status-mode').textContent = data.manualMode ? "Manual" : "Auto";
-    document.getElementById('status-state').textContent = data.currentState || "Unknown";
+            document.getElementById('status-mode').textContent = data.manualMode ? "Manual" : "Auto";
+            document.getElementById('status-state').textContent = data.currentState || "Unknown";
 
-    const coasterStatusEl = document.getElementById('status-coaster');
-    if (data.coasterDispatched) {
-        coasterStatusEl.textContent = "Dispatched";
-        coasterStatusEl.className = "font-bold text-lg text-green-600";
-    } else {
-        coasterStatusEl.textContent = "In Station";
-        coasterStatusEl.className = "font-bold text-lg text-gray-800";
-    }
+            const coasterStatusEl = document.getElementById('status-coaster');
+            if (data.coasterDispatched) {
+                coasterStatusEl.textContent = "Dispatched";
+                coasterStatusEl.className = "font-bold text-lg text-green-600";
+            } else {
+                coasterStatusEl.textContent = "In Station";
+                coasterStatusEl.className = "font-bold text-lg text-gray-800";
+            }
 
-    const dispatchBtn = document.getElementById('dispatch-button');
-    const isReady = data.currentState === 'IDLE' && !data.manualMode;
-    dispatchBtn.disabled = !isReady;
-    dispatchBtn.textContent = isReady ? "DISPATCH" : `NIET KLAAR (${data.currentState})`;
+            const dispatchBtn = document.getElementById('dispatch-button');
+            const isReady = data.currentState === 'IDLE' && !data.manualMode;
+            dispatchBtn.disabled = !isReady;
+            dispatchBtn.textContent = isReady ? "DISPATCH" : `NIET KLAAR (${data.currentState})`;
 
-    updateSensor('sensor-enterStation', !!data.hallSensorEnterStation);
-    updateSensor('sensor-startPosition', !!data.hallSensorStartPosition);
-    updateSensor('sensor-exitStation', !!data.hallSensorExitStation);
-    updateSensor('sensor-bottomLifthill', !!data.hallSensorBottomLifthill);
-    updateSensor('sensor-topLifthill', !!data.hallSensorTopLifthill);
-}
+            updateSensor('sensor-enterStation', !!data.hallSensorEnterStation);
+            updateSensor('sensor-startPosition', !!data.hallSensorStartPosition);
+            updateSensor('sensor-exitStation', !!data.hallSensorExitStation);
+            updateSensor('sensor-bottomLifthill', !!data.hallSensorBottomLifthill);
+            updateSensor('sensor-topLifthill', !!data.hallSensorTopLifthill);
+        }
 
-function updateTiltdropUI(data) {
-    if (!data) return;
+        function updateTiltdropUI(data) {
+            if (!data) return;
 
-    updateSensor('sensor-tiltdropClosed', !!data.hallSensorTiltdropClosed);
-    updateSensor('sensor-tiltdropOpen', !!data.hallSensorTiltdropOpen);
-    updateSensor('sensor-coasterOnTiltdrop', !!data.hallSensorOnTiltdrop);
+            updateSensor('sensor-tiltdropClosed', !!data.hallSensorTiltdropClosed);
+            updateSensor('sensor-tiltdropOpen', !!data.hallSensorTiltdropOpen);
+            updateSensor('sensor-coasterOnTiltdrop', !!data.hallSensorOnTiltdrop);
 
-    const tiltEl = document.getElementById('tiltdrop-element');
-    if (data.hallSensorTiltdropOpen) tiltEl.style.fill = '#ef4444';
-    else if (data.hallSensorTiltdropClosed) tiltEl.style.fill = '#22c55e';
-    else tiltEl.style.fill = '#ff8c00ff';
-}
+            const tiltEl = document.getElementById('tiltdrop-element');
+            if (data.hallSensorTiltdropOpen) tiltEl.style.fill = '#ef4444';
+            else if (data.hallSensorTiltdropClosed) tiltEl.style.fill = '#22c55e';
+            else tiltEl.style.fill = '#ff8c00ff';
+        }
 
 
         // === Heartbeat interval ===
@@ -252,13 +253,13 @@ function updateTiltdropUI(data) {
 
 
         function updateSensor(id, isActive) {
-    const el = document.getElementById(id);
-    if (!el) return;
+            const el = document.getElementById(id);
+            if (!el) return;
 
-    // toggle class op <use> zelf ipv .sensor
-    if (isActive) el.classList.add('active');
-    else el.classList.remove('active');
-}
+            // toggle class op <use> zelf ipv .sensor
+            if (isActive) el.classList.add('active');
+            else el.classList.remove('active');
+        }
 
 
         function setConnectStatus(device, status) {

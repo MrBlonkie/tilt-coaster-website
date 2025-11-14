@@ -20,14 +20,12 @@
                 <div class="space-y-3 p-4 bg-white shadow rounded-lg">
                     <div class="flex items-center justify-between">
                         <span class="font-medium text-gray-700">Station ESP:</span>
-                        <div id="station-connect-status"
-                            class="p-2 w-24 text-center rounded text-white bg-gray-400">
+                        <div id="station-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
                             Laden...</div>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="font-medium text-gray-700">Tiltdrop ESP:</span>
-                        <div id="tiltdrop-connect-status"
-                            class="p-2 w-24 text-center rounded text-white bg-gray-400">
+                        <div id="tiltdrop-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
                             Laden...</div>
                     </div>
                 </div>
@@ -35,8 +33,7 @@
                 {{-- JSON Dumps --}}
                 <div class="mb-6">
                     <h3 class="text-xl font-medium mb-2 text-gray-600">JSON Data Dumps (Live)</h3>
-                    <div
-                        class="bg-gray-800 text-green-400 p-4 rounded-lg shadow font-mono text-sm overflow-x-auto">
+                    <div class="bg-gray-800 text-green-400 p-4 rounded-lg shadow font-mono text-sm overflow-x-auto">
                         <p class="text-gray-400 mb-1">STATION:</p>
                         <pre id="station-json-output">{{ json_encode($station, JSON_PRETTY_PRINT) }}</pre>
                         <p class="text-gray-400 mt-4 mb-1">TILTDROP:</p>
@@ -79,7 +76,8 @@
     </div>
 
     <script>
-        const client = mqtt.connect('ws://10.11.171.126:9001');
+        const MQTT_HOST = "{{ env('PI_IP') }}";
+        const client = mqtt.connect(`ws://${MQTT_HOST}:9001`);
         const currentStatus = {
             station: {},
             tiltdrop: {},
@@ -153,8 +151,8 @@
                 {
                     id: 'tiltdropmotor',
                     esp: 'tiltdrop',
-                    field: 'isTiltdropTrackOpen' 
-                }, 
+                    field: 'isTiltdropTrackOpen'
+                },
                 {
                     id: 'releasedropmotor',
                     esp: 'tiltdrop',
@@ -164,15 +162,16 @@
             map.forEach(m => {
                 const el = document.getElementById(`${m.id}-status`);
                 if (!el) return;
-                
+
                 // === NIEUWE LOGICA VOOR TILTDROPMOTOR ===
                 if (m.id === 'tiltdropmotor') {
                     const isMoving = currentStatus.tiltdrop?.tiltdropMotorMoving ?? null;
                     const isOpen = currentStatus.tiltdrop?.hallSensorTiltdropOpen ?? null;
-                    const isClosed = currentStatus.tiltdrop?.hallSensorTiltdropClosed ?? null; // Gebruik de hallSensor voor Closed status
-                    
+                    const isClosed = currentStatus.tiltdrop?.hallSensorTiltdropClosed ??
+                    null; // Gebruik de hallSensor voor Closed status
+
                     el.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-gray-400');
-                    
+
                     if (isMoving === true) {
                         el.classList.add('bg-yellow-500');
                         el.innerText = 'MOVING';
@@ -187,7 +186,7 @@
                         el.innerText = 'Laden...';
                     }
                     return; // Stop de loop voor tiltdropmotor, want deze is afgehandeld
-                } 
+                }
                 // === EINDE NIEUWE LOGICA ===
 
 

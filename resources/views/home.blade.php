@@ -59,7 +59,8 @@
     </div>
 
     <script>
-    const client = mqtt.connect('ws://10.11.171.126:9001'); // Jouw broker adres
+    const MQTT_HOST = "{{ env('PI_IP') }}"; 
+    const client = mqtt.connect(`ws://${MQTT_HOST}:9001`);
     const logList = document.getElementById('event-log-list');
     const MAX_LOG_ENTRIES = 50;
 

@@ -170,6 +170,9 @@
             setConnectStatus('tiltdrop', 'unknown');
         });
 
+        client.publish('station/manual', 'off');
+        client.publish('tiltdrop/manual', 'off');
+
         client.on('message', (topic, payload) => {
             const msg = payload.toString().trim();
 

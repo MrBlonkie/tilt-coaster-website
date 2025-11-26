@@ -52,19 +52,30 @@
             <canvas id="tiltdrop-monitor" height="60" class="w-full bg-black rounded"></canvas>
         </div>
 
+        {{-- Switchtrack Monitor --}}
+        <div>
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-medium text-gray-300">Switchtrack ESP:</span>
+                <span id="switchtrack-connect-status" class="font-semibold text-gray-500 text-sm">
+                    INIT...
+                </span>
+            </div>
+            <canvas id="switchtrack-monitor" height="60" class="w-full bg-black rounded"></canvas>
+        </div>
+
     </div>
 </div>
 
         </div>
     </div>
 
-    <script>
+<script>
     const MQTT_HOST = "{{ env('PI_IP') }}"; 
     const client = mqtt.connect(`ws://${MQTT_HOST}:9001`);
     const logList = document.getElementById('event-log-list');
     const MAX_LOG_ENTRIES = 50;
 
-    let stationMonitor, tiltdropMonitor;
+    let stationMonitor, tiltdropMonitor, switchtrackMonitor;
 
     // === KLASSE VOOR DE HARTMONITOR ===
     class HeartbeatMonitor {
@@ -75,18 +86,12 @@
             this.height = this.canvas.height;
             
             this.baseLine = this.height / 2;
-            this.color = '#374151'; // Standaard grijs (gray-700)
+            this.color = '#374151'; 
             this.dataPoints = Array(this.width).fill(this.baseLine);
-            this.pingQueue = []; // Wachtrij voor de 'blip' animatie
+            this.pingQueue = [];
             
-            // --- WIJZIGING 1: GROTERE PIEK ---
-            // Deze waarden zijn nu veel groter voor een dramatisch effect.
-            // Baseline is 30. We gaan nu van +28 (y=58) naar -25 (y=5).
             this.blipPattern = [0, -10, -25, 0, 15, 28, 10, -5, 0];
-            
-            // --- WIJZIGING 2A: DE "FIX" ---
-            // We onthouden alleen DAT er een ping was, niet hoeveel.
-            this.blipRequested = false; 
+            this.blipRequested = false;
 
             this.draw();
         }
@@ -95,8 +100,6 @@
             this.color = hexColor;
         }
 
-        // --- WIJZIGING 2B: PING METHODE ---
-        // Zet alleen een vlaggetje. Voegt niks meer toe aan de wachtrij.
         ping() {
             this.blipRequested = true;
         }
@@ -104,33 +107,25 @@
         draw() {
             this.ctx.clearRect(0, 0, this.width, this.height);
 
-            // --- WIJZIGING 2C: ANIMATIE LOGICA ---
-            // Alleen als er een blip is aangevraagd EN de animatie niet al loopt...
             if (this.blipRequested && this.pingQueue.length === 0) {
-                this.pingQueue.push(...this.blipPattern); // ...start dan een NIEUWE blip
-                this.blipRequested = false; // Vlaggetje weer omlaag
+                this.pingQueue.push(...this.blipPattern);
+                this.blipRequested = false;
             }
-            // --- Einde Wijziging ---
 
-            // Haal het oudste datapunt weg (links)
             this.dataPoints.shift();
 
-            // Bepaal het nieuwe datapunt (rechts)
             let newPoint;
             if (this.pingQueue.length > 0) {
-                // Er is een blip bezig, neem punt uit de wachtrij
                 newPoint = this.baseLine + this.pingQueue.shift();
             } else {
-                // Geen blip, gebruik de basislijn met lichte ruis
                 newPoint = this.baseLine + (Math.random() * 2 - 1);
             }
             this.dataPoints.push(newPoint);
 
-            // Teken de lijn
             this.ctx.beginPath();
             this.ctx.strokeStyle = this.color;
-            this.ctx.lineWidth = 2.5; // Iets dikker voor de 'mooi'
-            this.ctx.shadowBlur = 4;  // Kleine gloed
+            this.ctx.lineWidth = 2.5;
+            this.ctx.shadowBlur = 4;
             this.ctx.shadowColor = this.color;
             this.ctx.moveTo(0, this.dataPoints[0]);
 
@@ -138,7 +133,7 @@
                 this.ctx.lineTo(i, this.dataPoints[i]);
             }
             this.ctx.stroke();
-            this.ctx.shadowBlur = 0; // Reset gloed
+            this.ctx.shadowBlur = 0;
 
             requestAnimationFrame(() => this.draw());
         }
@@ -146,26 +141,30 @@
 
     // === HEARTBEAT / LWT LOGICA ===
     const HEARTBEAT_TIMEOUT_MS = 4500;
-    const HEARTBEAT_TIMERS = { station: null, tiltdrop: null };
+    const HEARTBEAT_TIMERS = { station: null, tiltdrop: null, switchtrack: null };
 
     function setConnectStatus(device, status) {
         const el = document.getElementById(`${device}-connect-status`);
-        const monitor = (device === 'station') ? stationMonitor : tiltdropMonitor;
+        const monitor =
+            device === 'station' ? stationMonitor :
+            device === 'tiltdrop' ? tiltdropMonitor :
+            device === 'switchtrack' ? switchtrackMonitor :
+            null;
+
         if (!el || !monitor) return;
 
-        // Iets fellere kleuren voor de donkere achtergrond
         el.classList.remove('text-green-400', 'text-red-400', 'text-gray-400');
         let text = 'INIT...';
-        let color = '#9ca3af'; // gray-400
+        let color = '#9ca3af';
 
         if (status === 'online') {
             el.classList.add('text-green-400');
             text = 'ONLINE';
-            color = '#22c55e'; // green-500
+            color = '#22c55e';
         } else if (status === 'offline') {
             el.classList.add('text-red-400');
             text = 'OFFLINE';
-            color = '#f87171'; // red-400
+            color = '#f87171';
         } else {
             el.classList.add('text-gray-400');
         }
@@ -180,8 +179,13 @@
         }
         
         setConnectStatus(device, 'online');
-        
-        const monitor = (device === 'station') ? stationMonitor : tiltdropMonitor;
+
+        const monitor =
+            device === 'station' ? stationMonitor :
+            device === 'tiltdrop' ? tiltdropMonitor :
+            device === 'switchtrack' ? switchtrackMonitor :
+            null;
+
         if (monitor) monitor.ping();
         
         HEARTBEAT_TIMERS[device] = setTimeout(() => {
@@ -191,7 +195,7 @@
         }, HEARTBEAT_TIMEOUT_MS);
     }
 
-    // === LOG FUNCTIE (ONGEWIJZIGD) ===
+    // === LOG FUNCTIE ===
     function addLogEntry(topic, message, level = 'info') {
         if (logList.children.length > MAX_LOG_ENTRIES) {
             logList.removeChild(logList.firstChild);
@@ -201,6 +205,7 @@
         let colorClass = 'text-gray-700';
         if (level === 'error') colorClass = 'text-red-600';
         if (level === 'warn') colorClass = 'text-yellow-600';
+
         li.className = `p-2 rounded ${level === 'info' ? 'bg-gray-50' : 'bg-red-50'} ${colorClass}`;
         li.innerHTML = `
             <span class="text-gray-500">[${timestamp}]</span> 
@@ -210,39 +215,39 @@
         logList.parentElement.scrollTop = logList.parentElement.scrollHeight;
     }
 
-    // === MQTT CONNECTIE (ONGEWIJZIGD) ===
+    // === MQTT CONNECTIE ===
     client.on('connect', () => {
         console.log('MQTT connected!');
         client.subscribe('rollercoaster/station/status');
         client.subscribe('rollercoaster/tiltdrop/status');
+        client.subscribe('rollercoaster/switchtrack/status');
         client.subscribe('rollercoaster/log');
         client.subscribe('rollercoaster/estop');
         addLogEntry('MQTT', 'Verbonden met de broker.', 'success');
-        
-        if (HEARTBEAT_TIMERS['station']) clearTimeout(HEARTBEAT_TIMERS['station']);
-        HEARTBEAT_TIMERS['station'] = setTimeout(() => {
-            setConnectStatus('station', 'offline');
-            addLogEntry(`TIMEOUT`, `Station ESP was nooit online.`, 'error');
-        }, HEARTBEAT_TIMEOUT_MS);
 
-        if (HEARTBEAT_TIMERS['tiltdrop']) clearTimeout(HEARTBEAT_TIMERS['tiltdrop']);
-        HEARTBEAT_TIMERS['tiltdrop'] = setTimeout(() => {
-            setConnectStatus('tiltdrop', 'offline');
-            addLogEntry(`TIMEOUT`, `Tiltdrop ESP was nooit online.`, 'error');
-        }, HEARTBEAT_TIMEOUT_MS);
+        ['station','tiltdrop','switchtrack'].forEach(dev => {
+            if (HEARTBEAT_TIMERS[dev]) clearTimeout(HEARTBEAT_TIMERS[dev]);
+            HEARTBEAT_TIMERS[dev] = setTimeout(() => {
+                setConnectStatus(dev, 'offline');
+                addLogEntry(`TIMEOUT`, `${dev} ESP was nooit online.`, 'error');
+            }, HEARTBEAT_TIMEOUT_MS);
+        });
     });
 
-    // === MQTT BERICHTEN (ONGEWIJZIGD) ===
+    // === MQTT MESSAGES ===
     client.on('message', (topic, payload) => {
         const msg = payload.toString().trim();
+
         if (topic === 'rollercoaster/station/status' && msg.toLowerCase() === 'online') {
-            resetHeartbeatTimer('station');
-            return;
+            resetHeartbeatTimer('station'); return;
         }
         if (topic === 'rollercoaster/tiltdrop/status' && msg.toLowerCase() === 'online') {
-            resetHeartbeatTimer('tiltdrop');
-            return;
+            resetHeartbeatTimer('tiltdrop'); return;
         }
+        if (topic === 'rollercoaster/switchtrack/status' && msg.toLowerCase() === 'online') {
+            resetHeartbeatTimer('switchtrack'); return;
+        }
+
         if (topic === 'rollercoaster/log') {
             addLogEntry('LOG', msg);
         }
@@ -251,12 +256,16 @@
         }
     });
 
-    // === INIT (ONGEWIJZIGD) ===
+    // === INIT ===
     document.addEventListener('DOMContentLoaded', () => {
         stationMonitor = new HeartbeatMonitor('station-monitor');
         tiltdropMonitor = new HeartbeatMonitor('tiltdrop-monitor');
+        switchtrackMonitor = new HeartbeatMonitor('switchtrack-monitor');
+
         setConnectStatus('station', 'unknown');
         setConnectStatus('tiltdrop', 'unknown');
+        setConnectStatus('switchtrack', 'unknown');
+
         const firstLog = logList.querySelector('li');
         if (firstLog && firstLog.textContent.includes('Wachten')) {
             logList.removeChild(firstLog);

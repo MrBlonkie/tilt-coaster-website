@@ -11,15 +11,20 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::get('/test', function () {
+    return view('test');
+});
 
 
 Route::get('/status/latest', function() {
     $station = MqttMessage::where('topic', 'station/status')->latest()->first();
     $tiltdrop = MqttMessage::where('topic', 'tiltdrop/status')->latest()->first();
+    $switchtrack = MqttMessage::where('topic', 'switchtrack/status')->latest()->first();
 
     return response()->json([
         'station' => $station ? json_decode($station->message, true) : null,
         'tiltdrop' => $tiltdrop ? json_decode($tiltdrop->message, true) : null,
+        'switchtrack' => $switchtrack ? json_decode($switchtrack->message, true) : null,
     ]);
 });
 

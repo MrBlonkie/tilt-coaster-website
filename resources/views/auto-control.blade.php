@@ -7,81 +7,37 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {{-- KOLOM 1: VISUELE BAAN (MIMIC PANEL) --}}
+
             <div class="lg:col-span-2 bg-white shadow rounded-lg p-6">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Mimic Panel</h2>
+                <svg width="868" height="469" viewBox="0 0 868 469" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1">
+<rect id="station-stroke" x="48.2587" y="111" width="10" height="240" fill="#D9D9D9"/>
+<rect id="lifthill-stroke" x="104.259" y="68" width="10" height="552" transform="rotate(-90 104.259 68)" fill="#D9D9D9"/>
+<rect id="brake-stroke" x="110.793" y="389.847" width="10" height="256.439" transform="rotate(-111.427 110.793 389.847)" fill="#D9D9D9"/>
+<circle id="switch-base-shape" cx="45.2587" cy="411" r="29" fill="#D9D9D9"/>
+<rect id="switch-stroke" x="104.533" y="382.873" width="10" height="111.324" transform="rotate(69.8841 104.533 382.873)" fill="#D9D9D9"/>
+<rect id="backround-tiltdrop" x="655.759" y="0.5" width="211" height="246" fill="white" stroke="#D9D9D9"/>
+<rect id="tiltdrop-enter-stroke" x="656.259" y="97" width="10" height="81" transform="rotate(-90 656.259 97)" fill="#D9D9D9"/>
+<rect id="tiltdrop-stroke" x="737.811" y="97.1158" width="10" height="73.8804" transform="rotate(-90 737.811 97.1158)" fill="#D9D9D9"/>
+<rect id="tiltdrop-exit-stroke" x="769.259" y="126" width="10" height="120" fill="#D9D9D9"/>
+<circle id="tiltdrop-hinge" cx="774.259" cy="97" r="10" fill="#D9D9D9"/>
+<path id="layout-stroke" d="M773.859 229.41C773.859 240.755 774.543 256.684 775.067 281.682C775.29 292.34 775.248 298.519 774.725 311.804C774.415 319.654 773.174 327.204 772.651 332.923C771.97 340.352 770.416 354.831 769.539 362.474C768.24 373.809 767.305 389.759 766.428 398.247C765.764 404.685 764.194 412.906 762.456 424.852C760.91 435.488 756.25 446.465 753.989 451.494C752.821 454.093 749.685 457.882 745.542 461.683C743.126 463.9 739.657 463.441 736.032 462.58C734.423 462.198 733.435 461.377 732.735 460.511C730.085 457.234 730.655 452.396 730.474 447.04C730.242 440.191 732.377 434.767 733.409 430.613C734.845 424.833 735.82 415.083 736.696 394.208C737.085 384.956 738.247 378.081 738.77 371.854C739.155 367.282 741.005 361.157 742.052 355.432C743.367 348.25 744.469 343.506 745.853 339.353C747.737 333.702 747.58 325.876 748.793 321.552C750.432 315.71 746.211 307.915 744.827 302.714C742.994 295.829 739.657 287.526 737.054 281.802C733.735 274.503 727.917 270.913 721.685 265.899C715.586 260.992 710.62 260.19 704.75 259.313C699.964 258.599 683.086 258.447 656.18 259.474C631.833 260.403 618.322 265.354 614.526 266.733C605.492 270.016 591.048 277.073 583.239 281.594C577.196 285.093 571.344 300.158 567.662 312.167C564.461 322.609 566.449 344.336 568.513 362.116C569.3 368.903 576.799 373.539 588.517 381.136C595.561 385.702 611.28 384.625 627.868 383.936C634.901 383.643 638.327 382.551 648.801 379.295C671.078 372.369 687.41 363.552 691.901 360.446C696.585 357.206 697.449 350.434 699.015 344.714C700.166 340.509 700.228 330.087 699.368 319.146C698.89 313.076 697.47 306.878 695.053 302.019C692.492 296.869 684.382 288.231 677.092 282.315C670.837 277.239 660.883 275.414 653.582 272.8C643.058 269.033 624.565 270.208 602.139 269.684C593.691 269.487 587.563 267.096 581.165 264.68C575.65 262.598 570.97 259.505 566.464 258.276C561.973 257.051 557.136 255.689 552.122 254.133C547.603 252.731 542.286 251.541 534.176 248.269C512.855 239.667 503.915 240.818 488.053 238.235C470.227 235.333 463.822 236.669 450.004 233.055C443.568 231.372 436.859 226.672 430.787 224.059C426.305 222.13 417.528 217.691 408.325 211.282C402.884 207.494 398.467 201.43 394.314 199.17C390.014 196.829 383.97 193.134 373.423 189.152C366.959 186.711 362.523 182.411 358.017 177.92C353.803 173.72 343.545 166.212 339.34 159.943C336.955 156.387 337.613 151.652 337.774 137.346C337.89 127.021 342.778 121.93 345.718 117.424C348.734 112.802 354.165 107.764 359.023 104.798C363.314 102.179 369.036 101.853 380.563 100.992C401.231 99.4487 418.804 101.5 425.534 102.537C433.967 103.837 439.555 105.296 446.301 111.679C450.414 115.57 450.984 122.221 451.165 137.056C451.244 143.513 446.172 148.147 442.537 152.995C437.759 159.368 434.412 163.018 432.503 167.171C430.459 171.621 427.152 175.463 425.415 179.616C423.6 183.956 422.651 189.629 422.128 196.027C421.656 201.787 420.577 207.943 420.054 213.834C419.256 222.8 418.503 234.575 418.835 249.394C419.118 262.029 423.668 267.055 427.126 273.635C429.435 278.028 436.755 291.177 443.356 302.138C454.284 320.285 462.723 321.002 468.598 322.739C473.433 324.169 489.23 324.819 499.025 323.787C503.51 323.314 506.279 316.543 510.433 311.015C515.182 304.694 517.002 299.266 520.803 293.728C525.418 287.004 529.799 280.246 532.216 275.408C536.177 267.477 537.411 261.579 539.475 255.881C542.366 247.898 543.281 240.175 543.976 232.723C545.346 218.026 545.023 203.504 544.329 198.49C543.67 193.735 539.506 189.338 535.011 185.864C529.469 181.582 507.856 182.743 494.052 184.635C486.262 185.704 478.32 192.055 470.382 197.93C463.805 202.797 457.6 209.665 452.389 216.255C449.465 219.953 436.921 228.643 428.366 236.306C426.05 238.381 419.924 242.166 409.419 249.404C387.796 264.304 381.875 266.723 377.379 270.358C369.874 276.426 364.245 283.316 359.231 286.266C354.883 288.825 349.726 290.243 345.573 291.799C341.077 294.392 337.271 296.123 335.202 296.984C334.16 297.503 333.133 298.187 332.076 298.892" stroke="#D9D9D9" stroke-width="10" stroke-linecap="round"/>
+<path id="station-lifthill-turn" d="M52.7043 112.636C52.8495 112.636 52.9243 109.151 52.9969 103.617C53.0423 100.154 53.6546 97.9845 53.8405 95.4117C53.9586 93.7778 54.2442 91.3144 54.4268 89.5424C54.6527 87.3502 54.6842 85.8762 54.9031 84.8478C55.167 83.6077 55.4146 82.4312 55.8556 81.1091C56.3754 79.551 57.1745 78.7618 57.7255 77.8807C58.2395 77.0591 59.0048 75.9767 60.1069 74.8383C60.8945 74.0248 61.4995 73.1872 62.9283 71.8695C63.8375 71.031 64.7993 70.5474 65.8619 69.9237C67.666 68.8647 68.9791 68.5674 69.9691 67.9801C71.3583 67.1558 72.499 67.0979 73.38 66.879C74.2813 66.6551 75.284 66.2927 76.2399 65.9991C77.1276 65.7263 77.9987 65.4128 78.9161 65.2654C80.0961 65.0758 81.2238 64.7528 82.1796 64.6054C83.5306 64.3971 85.2584 64.0929 86.5409 63.9818C87.6909 63.8821 88.5582 63.6529 95.6474 63.5418C98.526 63.3581 101.168 63.2129 103.477 63.1018C103.96 63.0655 104.177 62.9929 104.842 62.9181" stroke="#D9D9D9" stroke-width="10" stroke-linecap="round"/>
+<circle id="enter-station-sensor" cx="53.2587" cy="314" r="10" fill="#D9D9D9"/>
+<circle id="start-position-sensor" cx="53.2587" cy="185" r="10" fill="#D9D9D9"/>
+<circle id="exit-station-sensor" cx="53.2587" cy="113" r="10" fill="#D9D9D9"/>
+<circle id="bottom-lifthill-sensor" cx="104.259" cy="63" r="10" fill="#D9D9D9"/>
+<circle id="enter-tiltdrop-sensor" cx="697.259" cy="92" r="10" fill="#D9D9D9"/>
+<circle id="exit-tiltdrop-sensor" cx="774.259" cy="226" r="10" fill="#D9D9D9"/>
+<circle id="enter-brake-sensor" cx="329.259" cy="299" r="10" fill="#D9D9D9"/>
+<circle id="exit-brake-sensor" cx="124.259" cy="380" r="10" fill="#D9D9D9"/>
+</g>
+</svg>
 
-                <svg id="mimic-panel" class="w-full" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
-                    <style>
-                        .track-segment {
-                            stroke: #cbd5e1;
-                            stroke-width: 10;
-                            fill: none;
-                            transition: stroke 0.3s;
-                        }
 
-                        .track-segment.active {
-                            stroke: #3b82f6;
-                            stroke-width: 12;
-                        }
 
-                        .sensor {
-                            fill: #9ca3af;
-                            stroke: #4b5563;
-                            stroke-width: 1;
-                            r: 8;
-                            transition: fill 0.3s;
-                        }
 
-                        .sensor.active {
-                            fill: #22c55e;
-                            r: 10;
-                        }
-
-                        .sensor-label {
-                            font-size: 10px;
-                            font-family: sans-serif;
-                            fill: #374151;
-                            text-anchor: middle;
-                        }
-                    </style>
-
-                    <defs>
-                        <g id="sensor-group">
-                            <circle class="sensor" cx="0" cy="0" />
-                            <text class="sensor-label" x="0" y="-15"></text>
-                        </g>
-                    </defs>
-
-                    {{-- Station --}}
-                    <rect x="20" y="50" width="250" height="50" rx="5" fill="#f3f4f6" stroke="#e5e7eb"
-                        stroke-width="2" />
-                    <text x="145" y="80" text-anchor="middle" font-weight="bold" fill="#4b5563">STATION</text>
-                    <path id="block-station" class="track-segment" d="M 40 100 H 260" />
-
-                    <use href="#sensor-group" x="60" y="100" id="sensor-enterStation" data-label="Enter" />
-                    <use href="#sensor-group" x="150" y="100" id="sensor-startPosition" data-label="Start" />
-                    <use href="#sensor-group" x="240" y="100" id="sensor-exitStation" data-label="Exit" />
-
-                    {{-- Lifthill --}}
-                    <path id="block-lifthill" class="track-segment" d="M 260 100 L 320 40 L 380 40" />
-                    <use href="#sensor-group" x="270" y="90" id="sensor-bottomLifthill" data-label="Lift Bottom" />
-                    <use href="#sensor-group" x="370" y="40" id="sensor-topLifthill" data-label="Lift Top" />
-
-                    {{-- Tiltdrop Section --}}
-                    <path id="block-tiltdrop" class="track-segment" d="M 380 40 L 450 40" />
-                    <rect id="tiltdrop-element" x="450" y="35" width="80" height="10" rx="2"
-                        fill="#e2e8f0" transition="fill 0.3s" />
-                    <text x="490" y="25" class="sensor-label">Tiltdrop</text>
-
-                    <use href="#sensor-group" x="460" y="60" id="sensor-tiltdropClosed" data-label="Tilt Closed" />
-                    <use href="#sensor-group" x="490" y="60" id="sensor-tiltdropOpen" data-label="Tilt Open" />
-                    <use href="#sensor-group" x="520" y="60" id="sensor-coasterOnTiltdrop" data-label="Coaster On" />
-
-                    {{-- Return Track --}}
-                    <path id="block-return" class="track-segment"
-                        d="M 530 40 C 600 40, 600 200, 400 200 L 40 200 L 40 100" />
-
-                </svg>
             </div>
 
             {{-- KOLOM 2: STATUS & CONTROLS --}}
@@ -189,9 +145,15 @@
             }
 
             if (topic === 'rollercoaster/event') {
-                appendLogMessage(msg);
-                return;
+                appendLogMessage(msg); // log alles
+                if (msg.toLowerCase() === 'tiltdrop_opening') {
+                    animateTiltdrop(true);
+                }
+                if (msg.toLowerCase() === 'tiltdrop_resetting') {
+                    animateTiltdrop(false);
+                }
             }
+
 
             // === STATUS BERICHT (JSON only) ===
             let data;
@@ -206,46 +168,6 @@
             if (topic === 'tiltdrop/status') updateTiltdropUI(data);
         });
 
-        function updateStationUI(data) {
-            if (!data) return;
-
-            document.getElementById('status-mode').textContent = data.manualMode ? "Manual" : "Auto";
-            document.getElementById('status-state').textContent = data.currentState || "Unknown";
-
-            const coasterStatusEl = document.getElementById('status-coaster');
-            if (data.coasterDispatched) {
-                coasterStatusEl.textContent = "Dispatched";
-                coasterStatusEl.className = "font-bold text-lg text-green-600";
-            } else {
-                coasterStatusEl.textContent = "In Station";
-                coasterStatusEl.className = "font-bold text-lg text-gray-800";
-            }
-
-            const dispatchBtn = document.getElementById('dispatch-button');
-            const isReady = data.currentState === 'IDLE' && !data.manualMode;
-            dispatchBtn.disabled = !isReady;
-            dispatchBtn.textContent = isReady ? "DISPATCH" : `NIET KLAAR (${data.currentState})`;
-
-            updateSensor('sensor-enterStation', !!data.hallSensorEnterStation);
-            updateSensor('sensor-startPosition', !!data.hallSensorStartPosition);
-            updateSensor('sensor-exitStation', !!data.hallSensorExitStation);
-            updateSensor('sensor-bottomLifthill', !!data.hallSensorBottomLifthill);
-            updateSensor('sensor-topLifthill', !!data.hallSensorTopLifthill);
-        }
-
-        function updateTiltdropUI(data) {
-            if (!data) return;
-
-            updateSensor('sensor-tiltdropClosed', !!data.hallSensorTiltdropClosed);
-            updateSensor('sensor-tiltdropOpen', !!data.hallSensorTiltdropOpen);
-            updateSensor('sensor-coasterOnTiltdrop', !!data.hallSensorOnTiltdrop);
-
-            const tiltEl = document.getElementById('tiltdrop-element');
-            if (data.hallSensorTiltdropOpen) tiltEl.style.fill = '#ef4444';
-            else if (data.hallSensorTiltdropClosed) tiltEl.style.fill = '#22c55e';
-            else tiltEl.style.fill = '#ff8c00ff';
-        }
-
 
         // === Heartbeat interval ===
         setInterval(() => {
@@ -253,16 +175,6 @@
             if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('tiltdrop', 'offline');
         }, 1000);
 
-
-
-        function updateSensor(id, isActive) {
-            const el = document.getElementById(id);
-            if (!el) return;
-
-            // toggle class op <use> zelf ipv .sensor
-            if (isActive) el.classList.add('active');
-            else el.classList.remove('active');
-        }
 
 
         function setConnectStatus(device, status) {
@@ -307,5 +219,123 @@
 
             if (logContainer.children.length > 200) logContainer.removeChild(logContainer.firstChild);
         }
+
+        // Zet fill-kleur op een SVG shape
+        function setFill(id, color) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.setAttribute("fill", color);
+        }
+
+        // Zet stroke-kleur op een shape (voor paden)
+        function setStroke(id, color) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.setAttribute("stroke", color);
+        }
+
+        // Zet een shape even te knipperen (optioneel)
+        function flash(id, color = "yellow", duration = 300) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const old = el.getAttribute("fill");
+            el.setAttribute("fill", color);
+
+            setTimeout(() => {
+                el.setAttribute("fill", old);
+            }, duration);
+        }
+
+        function updateStationUI(data) {
+            if (!data) return;
+
+            document.getElementById('status-mode').textContent = data.manualMode ? "Manual" : "Auto";
+            document.getElementById('status-state').textContent = data.currentState || "Unknown";
+
+            const coasterStatusEl = document.getElementById('status-coaster');
+            if (data.coasterDispatched) {
+                coasterStatusEl.textContent = "Dispatched";
+                coasterStatusEl.className = "font-bold text-lg text-green-600";
+            } else {
+                coasterStatusEl.textContent = "In Station";
+                coasterStatusEl.className = "font-bold text-lg text-gray-800";
+            }
+
+            const dispatchBtn = document.getElementById('dispatch-button');
+            const isReady = data.currentState === 'IDLE' && !data.manualMode;
+            dispatchBtn.disabled = !isReady;
+            dispatchBtn.textContent = isReady ? "DISPATCH" : `NIET KLAAR (${data.currentState})`;
+
+            setFill("exit-station-sensor", data.hallSensorExitStationCheck ? "#00FF00" : "#ee2e2eff");
+            setFill("bottom-lifthill-sensor", data.hallSensorBottomLifthillCheck ? "#00FF00" : "#ee2e2eff");
+            setFill("enter-station-sensor", data.hallSensorEnterStationCheck ? "#00FF00" : "#ee2e2eff");
+            setFill("start-position-sensor", data.hallSensorStartPositionCheck ? "#00FF00" : "#ee2e2eff");
+
+        }
+
+        function updateTiltdropUI(data) {
+            if (!data) return;
+            setFill("enter-tiltdrop-sensor", data.hallSensorEnterTiltdropCheck ? "#00FF00" : "#ee2e2eff");
+            setFill("exit-tiltdrop-sensor", data.hallSensorExitTiltdropCheck ? "#00FF00" : "#ee2e2eff");
+        }
+
+       // Huidige hoek van de animatie (0 = vlak/gesloten, 90 = drop/open)
+let currentTiltAngle = 0; 
+let tiltdropAnimating = false;
+
+// Constanten uit je SVG (Hinge punt)
+const hingeX = 769;
+const hingeY = 97;
+
+// Constanten van de originele positie (uit de SVG <rect> tag)
+const baseRotation = "rotate(-90 737.811 97.1158)";
+
+function animateTiltdrop(open = true) {
+    const rect = document.getElementById("tiltdrop-stroke");
+    if (!rect || tiltdropAnimating) return;
+
+    // Bepaal doel: 90 graden (naar beneden) of 0 graden (terug vlak)
+    const targetAngle = open ? 90 : 0;
+    
+    // Als we er al zijn, doe niets
+    if (Math.abs(currentTiltAngle - targetAngle) < 0.1) return;
+
+    tiltdropAnimating = true;
+    const speed = 1; // Snelheid van de animatie
+
+    function step() {
+        let reachedTarget = false;
+
+        if (currentTiltAngle < targetAngle) {
+            currentTiltAngle += speed;
+            if (currentTiltAngle >= targetAngle) {
+                currentTiltAngle = targetAngle;
+                reachedTarget = true;
+            }
+        } else if (currentTiltAngle > targetAngle) {
+            currentTiltAngle -= speed;
+            if (currentTiltAngle <= targetAngle) {
+                currentTiltAngle = targetAngle;
+                reachedTarget = true;
+            }
+        }
+
+        // DE FIX: We passen EERST de animatie-rotatie toe rond de Hinge, 
+        // en DAARNA pas de basis-rotatie die het blokje horizontaal legt.
+        // SVG voert transforms van rechts naar links uit (of binnen naar buiten).
+        // Volgorde: Basispositie (-90) -> Dan kantelen (currentAngle)
+        rect.setAttribute("transform", `rotate(${currentTiltAngle} ${hingeX} ${hingeY}) ${baseRotation}`);
+
+        if (!reachedTarget) {
+            requestAnimationFrame(step);
+        } else {
+            tiltdropAnimating = false;
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
     </script>
 </x-layout>

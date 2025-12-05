@@ -8,6 +8,9 @@
         <div class="flex flex-row flex-wrap items-center gap-6 mb-6 p-4 bg-white shadow rounded-lg">
             <x-toggle name="manual-switch-station" id="manual-switch-station">Manual Switch Station</x-toggle>
             <x-toggle name="manual-switch-tiltdrop" id="manual-switch-tiltdrop">Manual Switch Tiltdrop</x-toggle>
+            <x-toggle name="manual-switch-brakes" id="manual-switch-brakes">Manual Switch Brakes</x-toggle>
+            <x-toggle name="manual-switch-switchtrack" id="manual-switch-switchtrack">Manual Switch
+                Switchtrack</x-toggle>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -35,10 +38,19 @@
                         </div>
                     </div>
 
-                    {{-- SWITCHTRACK (NIEUW) --}}
+                    {{-- BRAKES --}}
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-700">Brakes ESP:</span>
+                        <div id="brakes-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
+                            Laden...
+                        </div>
+                    </div>
+
+                    {{-- SWITCHTRACK --}}
                     <div class="flex items-center justify-between">
                         <span class="font-medium text-gray-700">Switchtrack ESP:</span>
-                        <div id="switchtrack-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
+                        <div id="switchtrack-connect-status"
+                            class="p-2 w-24 text-center rounded text-white bg-gray-400">
                             Laden...
                         </div>
                     </div>
@@ -70,30 +82,34 @@
 
                 <div class="space-y-4">
 
-                    @foreach ([
-                        ['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']],
-                        ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']],
-                        ['id' => 'stationfan', 'label' => 'STATION FAN', 'esp' => 'station', 'actions' => ['on', 'off']],
-                        ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']],
-                        ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']],                         
-                    ] as $motor)
-
+                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], 
+                    ['id' => 'stationfan', 'label' => 'STATION FAN', 'esp' => 'station', 'actions' => ['on', 'off']], 
+                    ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], 
+                    ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], 
+                    ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], 
+                    ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], 
+                    ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], 
+                    ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
                         <x-control-card showStatus>
                             <p class="text-gray-500 text-sm">{{ $motor['label'] }}</p>
 
                             <x-slot name="buttons">
                                 @if ($motor['actions'][0] === 'on')
-                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}" data-action="on">
+                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}"
+                                        data-action="on">
                                         {{ strtoupper($motor['actions'][0]) }}
                                     </x-esp-button>
-                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}" data-action="off">
+                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}"
+                                        data-action="off">
                                         {{ strtoupper($motor['actions'][1]) }}
                                     </x-esp-button>
                                 @else
-                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}" data-action="off">
+                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}"
+                                        data-action="off">
                                         {{ strtoupper($motor['actions'][1]) }}
                                     </x-esp-button>
-                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}" data-action="on">
+                                    <x-esp-button class="js-esp-button" data-target="{{ $motor['id'] }}"
+                                        data-action="on">
                                         {{ strtoupper($motor['actions'][0]) }}
                                     </x-esp-button>
                                 @endif
@@ -102,7 +118,6 @@
                             <div id="{{ $motor['id'] }}-status"
                                 class="mt-2 p-2 rounded text-white bg-gray-400 text-center">Laden...</div>
                         </x-control-card>
-
                     @endforeach
                 </div>
 
@@ -121,21 +136,32 @@
             switchtrack: {},
             stationLwt: '{{ $stationOnline }}',
             tiltdropLwt: '{{ $tiltdropOnline }}',
-            switchtrackLwt: '{{ $switchtrackOnline ?? "offline" }}'
+            switchtrackLwt: '{{ $switchtrackOnline ?? 'offline' }}'
         };
 
         const HEARTBEAT_TIMEOUT_MS = 4500;
-        const HEARTBEAT_TIMERS = { station: null, tiltdrop: null, switchtrack: null };
+        const HEARTBEAT_TIMERS = {
+            station: null,
+            tiltdrop: null,
+            switchtrack: null
+        };
 
         function setConnectStatus(device, status) {
             currentStatus[`${device}Lwt`] = status;
             const el = document.getElementById(`${device}-connect-status`);
             if (!el) return;
 
-            el.classList.remove('bg-green-500','bg-red-500','bg-gray-400');
-            if (status === 'online') { el.classList.add('bg-green-500'); el.innerText = 'Online'; }
-            else if (status === 'offline') { el.classList.add('bg-red-500'); el.innerText = 'Offline'; }
-            else { el.classList.add('bg-gray-400'); el.innerText = 'Laden...'; }
+            el.classList.remove('bg-green-500', 'bg-red-500', 'bg-gray-400');
+            if (status === 'online') {
+                el.classList.add('bg-green-500');
+                el.innerText = 'Online';
+            } else if (status === 'offline') {
+                el.classList.add('bg-red-500');
+                el.innerText = 'Offline';
+            } else {
+                el.classList.add('bg-gray-400');
+                el.innerText = 'Laden...';
+            }
         }
 
         function resetHeartbeatTimer(device) {
@@ -150,28 +176,55 @@
         function updateJsonUI() {
             document.getElementById('station-json-output').innerText = JSON.stringify(currentStatus.station, null, 2);
             document.getElementById('tiltdrop-json-output').innerText = JSON.stringify(currentStatus.tiltdrop, null, 2);
-            document.getElementById('switchtrack-json-output').innerText = JSON.stringify(currentStatus.switchtrack, null, 2);
+            document.getElementById('switchtrack-json-output').innerText = JSON.stringify(currentStatus.switchtrack, null,
+                2);
         }
 
         function updateMotorUI() {
-            const map = [
-                { id: 'stationmotor', esp: 'station', field: 'stationMotorState' },
-                { id: 'lifthillmotor', esp: 'station', field: 'liftMotorState' },
-                { id: 'tiltdropmotor', esp: 'tiltdrop', field: 'isTiltdropTrackOpen' },
-                { id: 'releasedropmotor', esp: 'tiltdrop', field: 'releasedropMotorState' },
-                { id: 'stationfan', esp: 'station', field: 'relayState' },
+            const map = [{
+                    id: 'stationmotor',
+                    esp: 'station',
+                    field: 'stationMotorState'
+                },
+                {
+                    id: 'lifthillmotor',
+                    esp: 'station',
+                    field: 'liftMotorState'
+                },
+                {
+                    id: 'tiltdropmotor',
+                    esp: 'tiltdrop',
+                    field: 'isTiltdropTrackOpen'
+                },
+                {
+                    id: 'releasedropmotor',
+                    esp: 'tiltdrop',
+                    field: 'releasedropMotorState'
+                },
+                {
+                    id: 'stationfan',
+                    esp: 'station',
+                    field: 'relayState'
+                },
             ];
 
             map.forEach(m => {
                 const el = document.getElementById(`${m.id}-status`);
                 if (!el) return;
 
-                el.classList.remove('bg-green-500','bg-red-500','bg-yellow-500','bg-gray-400');
+                el.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-gray-400');
                 const val = currentStatus[m.esp]?.[m.field];
 
-                if (val === true) { el.classList.add('bg-green-500'); el.innerText = 'ON'; }
-                else if (val === false) { el.classList.add('bg-red-500'); el.innerText = 'OFF'; }
-                else { el.classList.add('bg-gray-400'); el.innerText = 'Laden...'; }
+                if (val === true) {
+                    el.classList.add('bg-green-500');
+                    el.innerText = 'ON';
+                } else if (val === false) {
+                    el.classList.add('bg-red-500');
+                    el.innerText = 'OFF';
+                } else {
+                    el.classList.add('bg-gray-400');
+                    el.innerText = 'Laden...';
+                }
             });
         }
 
@@ -183,7 +236,7 @@
             updateMotorUI();
             updateJsonUI();
 
-            ['station','tiltdrop'].forEach(dev => {
+            ['station', 'tiltdrop'].forEach(dev => {
                 const toggle = document.getElementById(`manual-switch-${dev}`);
                 if (toggle && typeof currentStatus[dev]?.manualMode !== 'undefined') {
                     toggle.checked = currentStatus[dev].manualMode;
@@ -209,8 +262,10 @@
             const msg = payload.toString().trim();
 
             if (topic === 'rollercoaster/station/status' && msg === 'online') return resetHeartbeatTimer('station');
-            if (topic === 'rollercoaster/tiltdrop/status' && msg === 'online') return resetHeartbeatTimer('tiltdrop');
-            if (topic === 'rollercoaster/switchtrack/status' && msg === 'online') return resetHeartbeatTimer('switchtrack');
+            if (topic === 'rollercoaster/tiltdrop/status' && msg === 'online') return resetHeartbeatTimer(
+                'tiltdrop');
+            if (topic === 'rollercoaster/switchtrack/status' && msg === 'online') return resetHeartbeatTimer(
+                'switchtrack');
 
             try {
                 const data = JSON.parse(msg);
@@ -229,24 +284,74 @@
         document.getElementById('manual-switch-tiltdrop')?.addEventListener('change', e =>
             client.publish('tiltdrop/manual', e.target.checked ? 'on' : 'off')
         );
+        document.getElementById('manual-switch-switchtrack')?.addEventListener('change', e =>
+            client.publish('switchtrack/manual', e.target.checked ? 'on' : 'off')
+        );
+
+        const MOTOR_MAP = {
+            stationmotor: {
+                esp: "station",
+                topic: "station/stationmotor"
+            },
+            lifthillmotor: {
+                esp: "station",
+                topic: "station/lifthillmotor"
+            },
+            stationfan: {
+                esp: "station",
+                topic: "station/stationfan"
+            },
+
+            tiltdropmotor: {
+                esp: "tiltdrop",
+                topic: "tiltdrop/tiltdropmotor",
+                type: "servo"
+            },
+            releasedropmotor: {
+                esp: "tiltdrop",
+                topic: "tiltdrop/releasedropmotor",
+                type: "servo"
+            },
+            releasebrakesmotor: {
+                esp: "tiltdrop",
+                topic: "tiltdrop/releasebrakesmotor",
+                type: "servo"
+            },
+
+            switchtrackmotor: {
+                esp: "switchtrack",
+                topic: "switchtrack/rotatemotor"
+            },
+            releaseswitchtrackmotor: {
+                esp: "switchtrack",
+                topic: "switchtrack/releaseswitchtrackmotor",
+                type: "servo"
+            },
+        };
+
 
         document.querySelectorAll('.js-esp-button').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.dataset.target;
-                let action = btn.dataset.action;
+                const action = btn.dataset.action;
 
-                const tiltdropMotors = ['tiltdropmotor','releasedropmotor'];
-                if (tiltdropMotors.includes(target)) {
-                    action = action === 'on' ? 'open' : 'close';
+                const config = MOTOR_MAP[target];
+                if (!config) {
+                    console.warn(`No config found for motor: ${target}`);
+                    return;
                 }
 
-                let topic = ['stationmotor','lifthillmotor','stationfan'].includes(target)
-                    ? `station/${target}`
-                    : `tiltdrop/${target}`;
+                let finalAction = action;
 
-                client.publish(topic, action);
+                // Speciale gevallen (servo’s, open/close mapping)
+                if (config.type === "servo") {
+                    finalAction = action === 'on' ? 'open' : 'close';
+                }
+
+                client.publish(config.topic, finalAction);
             });
         });
+
 
         document.addEventListener('DOMContentLoaded', updateAllUI);
     </script>

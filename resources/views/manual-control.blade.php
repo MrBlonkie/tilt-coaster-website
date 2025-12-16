@@ -5,12 +5,11 @@
         <h1 class="text-3xl font-bold mb-6 text-gray-800">Rollercoaster Manual Controls</h1>
 
         {{-- Manual Toggles --}}
-        <div class="flex flex-row flex-wrap items-center gap-6 mb-6 p-4 bg-white shadow rounded-lg">
-            <x-toggle name="manual-switch-station" id="manual-switch-station">Manual Switch Station</x-toggle>
-            <x-toggle name="manual-switch-tiltdrop" id="manual-switch-tiltdrop">Manual Switch Tiltdrop</x-toggle>
-            <x-toggle name="manual-switch-brakes" id="manual-switch-brakes">Manual Switch Brakes</x-toggle>
-            <x-toggle name="manual-switch-switchtrack" id="manual-switch-switchtrack">Manual Switch
-                Switchtrack</x-toggle>
+        <div class="flex flex-row flex-wrap items-center gap-6 mb-6 p-4 bg-white shadow rounded-lg font-semibold">
+            <x-toggle name="manual-switch-station" id="manual-switch-station">STATION</x-toggle>
+            <x-toggle name="manual-switch-tiltdrop" id="manual-switch-tiltdrop">TILTDROP</x-toggle>
+            <x-toggle name="manual-switch-brakes" id="manual-switch-brakes">BRAKES</x-toggle>
+            <x-toggle name="manual-switch-switchtrack" id="manual-switch-switchtrack">SWITCHTRACK</x-toggle>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -82,14 +81,7 @@
 
                 <div class="space-y-4">
 
-                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], 
-                    ['id' => 'stationfan', 'label' => 'STATION FAN', 'esp' => 'station', 'actions' => ['on', 'off']], 
-                    ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], 
-                    ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], 
-                    ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], 
-                    ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], 
-                    ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], 
-                    ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
+                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'stationfan', 'label' => 'STATION FAN', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
                         <x-control-card showStatus>
                             <p class="text-gray-500 text-sm">{{ $motor['label'] }}</p>
 
@@ -136,7 +128,7 @@
             switchtrack: {},
             stationLwt: '{{ $stationOnline }}',
             tiltdropLwt: '{{ $tiltdropOnline }}',
-            switchtrackLwt: '{{ $switchtrackOnline ?? 'offline' }}'
+            switchtrackLwt: '{{ $switchtrackOnline }}'
         };
 
         const HEARTBEAT_TIMEOUT_MS = 4500;
@@ -206,6 +198,18 @@
                     esp: 'station',
                     field: 'relayState'
                 },
+                {
+                    id: 'switchtrackmotor',
+                    esp: 'switchtrack',
+                    field: 'rotateTarget',
+                    type: 'switchtrack'
+                },
+
+                {
+                    id: 'releaseswitchtrackmotor',
+                    esp: 'switchtrack',
+                    field: 'releaseswitchMotorState'
+                },
             ];
 
             map.forEach(m => {
@@ -213,6 +217,52 @@
                 if (!el) return;
 
                 el.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-gray-400');
+
+                // Speciale UI handling voor switchtrack rotateTarget
+                if (m.type === 'switchtrack') {
+                    const moving = currentStatus.switchtrack?.isSwitchtrackMoving;
+                    const target = currentStatus.switchtrack?.rotateTarget;
+
+                    if (moving === true) {
+                        el.classList.add('bg-yellow-500');
+                        el.innerText = 'MOVING';
+                    } else if (target === 'station') {
+                        el.classList.add('bg-green-500');
+                        el.innerText = 'STATION';
+                    } else if (target === 'brakes') {
+                        el.classList.add('bg-green-500');
+                        el.innerText = 'BRAKES';
+                    } else {
+                        el.classList.add('bg-gray-400');
+                        el.innerText = 'Laden...';
+                    }
+                    return;
+                }
+
+                if (m.id === 'tiltdropmotor') {
+                    const moving = currentStatus.tiltdrop?.tiltdropMotorMoving;
+                    const open = currentStatus.tiltdrop?.isTiltdropTrackOpen;
+                    const closed = currentStatus.tiltdrop?.hallSensorTiltdropClosed;
+
+                    if (moving) {
+                        el.classList.add('bg-red-500');
+                        el.innerText = 'MOVING';
+                    } else if (open) {
+                        el.classList.add('bg-orange-500');
+                        el.innerText = 'OPEN';
+                    } else if (closed) {
+                        el.classList.add('bg-green-500');
+                        el.innerText = 'CLOSED';
+                    } else {
+                        el.classList.add('bg-gray-400');
+                        el.innerText = 'Laden...';
+                    }
+
+                    return; // stop verdere verwerking voor dit element
+                }
+
+
+                // Standaard boolean motor UI
                 const val = currentStatus[m.esp]?.[m.field];
 
                 if (val === true) {
@@ -226,6 +276,7 @@
                     el.innerText = 'Laden...';
                 }
             });
+
         }
 
         function updateAllUI() {
@@ -236,7 +287,7 @@
             updateMotorUI();
             updateJsonUI();
 
-            ['station', 'tiltdrop'].forEach(dev => {
+            ['station', 'tiltdrop', 'switchtrack'].forEach(dev => {
                 const toggle = document.getElementById(`manual-switch-${dev}`);
                 if (toggle && typeof currentStatus[dev]?.manualMode !== 'undefined') {
                     toggle.checked = currentStatus[dev].manualMode;

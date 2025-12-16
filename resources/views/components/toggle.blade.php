@@ -4,116 +4,120 @@
     'checked' => false,
 ])
 
-<div class="toggler">
-    <input
-        type="checkbox"
-        id="{{ $id }}"
-        name="{{ $name }}"
-        {{ $checked ? 'checked' : '' }}
-        {{ $attributes }}
-    >
-    <label for="{{ $id }}">
-        <span class="toggler-on"></span>
-        <span class="toggler-off"></span>
-    </label>
-    {{ $slot }}
-</div>
+<div class="toggler flex flex-col items-center">  <input type="checkbox"
+        id="{{ $id }}" name="{{ $name }}" {{ $checked ? 'checked' : '' }} {{ $attributes }}>
+        <label for="{{ $id }}" class="mb-2"></label>  <span
+            class="toggler-on"></span>
+            <span class="toggler-off"></span>
+            <div class="text-center"> {{ $slot }}
+                    </div>
+            </div>
 
 
-<style>
-  /* From Uiverse.io by mobinkakei */ 
-  .toggler {
-    width: 72px;
-    margin: 40px auto;
-  }
+            <style>
+                /* From Uiverse.io by mobinkakei */
+                .toggler {
+                    width: 72px;
+                    margin: 40px auto;
+                }
 
-  .toggler input {
-    display: none;
-  }
+                .toggler input {
+                    display: none;
+                }
 
-  .toggler label {
-    display: block;
-    position: relative;
-    width: 72px;
-    height: 36px;
-    border: 1px solid #d6d6d6;
-    border-radius: 36px;
-    background: #e4e8e8;
-    cursor: pointer;
-  }
+                .toggler label {
+                    display: block;
+                    position: relative;
+                    width: 72px;
+                    height: 36px;
+                    border: 1px solid #d6d6d6;
+                    border-radius: 36px;
+                    background: #e4e8e8;
+                    cursor: pointer;
+                }
 
-  .toggler label::after {
-    display: block;
-    border-radius: 100%;
-    background-color: #d7062a;
-    content: '';
-    animation-name: toggler-size;
-    animation-duration: 0.15s;
-    animation-timing-function: ease-out;
-    animation-direction: forwards;
-    animation-iteration-count: 1;
-    animation-play-state: running;
-  }
+                .toggler label::after {
+                    display: block;
+                    border-radius: 100%;
+                    background-color: #d7062a;
+                    content: '';
+                    animation-name: toggler-size;
+                    animation-duration: 0.15s;
+                    animation-timing-function: ease-out;
+                    animation-direction: forwards;
+                    animation-iteration-count: 1;
+                    animation-play-state: running;
+                }
 
-  .toggler label::after, .toggler label .toggler-on, .toggler label .toggler-off {
-    position: absolute;
-    top: 50%;
-    left: 25%;
-    width: 26px;
-    height: 26px;
-    transform: translateY(-50%) translateX(-50%);
-    transition: left 0.15s ease-in-out, background-color 0.2s ease-out, width 0.15s ease-in-out, height 0.15s ease-in-out, opacity 0.15s ease-in-out;
-  }
+                .toggler label::after,
+                .toggler label .toggler-on,
+                .toggler label .toggler-off {
+                    position: absolute;
+                    top: 50%;
+                    left: 25%;
+                    width: 26px;
+                    height: 26px;
+                    transform: translateY(-50%) translateX(-50%);
+                    transition: left 0.15s ease-in-out, background-color 0.2s ease-out, width 0.15s ease-in-out, height 0.15s ease-in-out, opacity 0.15s ease-in-out;
+                }
 
-  .toggler input:checked + label::after, .toggler input:checked + label .toggler-on, .toggler input:checked + label .toggler-off {
-    left: 75%;
-  }
+                .toggler input:checked+label::after,
+                .toggler input:checked+label .toggler-on,
+                .toggler input:checked+label .toggler-off {
+                    left: 75%;
+                }
 
-  .toggler input:checked + label::after {
-    background-color: #50ac5d;
-    animation-name: toggler-size2;
-  }
+                .toggler input:checked+label::after {
+                    background-color: #50ac5d;
+                    animation-name: toggler-size2;
+                }
 
-  .toggler .toggler-on, .toggler .toggler-off {
-    opacity: 1;
-    z-index: 2;
-  }
+                .toggler .toggler-on,
+                .toggler .toggler-off {
+                    opacity: 1;
+                    z-index: 2;
+                }
 
-  .toggler input:checked + label .toggler-off, .toggler input:not(:checked) + label .toggler-on {
-    width: 0;
-    height: 0;
-    opacity: 0;
-  }
+                .toggler input:checked+label .toggler-off,
+                .toggler input:not(:checked)+label .toggler-on {
+                    width: 0;
+                    height: 0;
+                    opacity: 0;
+                }
 
-  .toggler .path {
-    fill: none;
-    stroke: #fefefe;
-    stroke-width: 7px;
-    stroke-linecap: round;
-    stroke-miterlimit: 10;
-  }
+                .toggler .path {
+                    fill: none;
+                    stroke: #fefefe;
+                    stroke-width: 7px;
+                    stroke-linecap: round;
+                    stroke-miterlimit: 10;
+                }
 
-  @keyframes toggler-size {
-    0%, 100% {
-      width: 26px;
-      height: 26px;
-    }
+                @keyframes toggler-size {
 
-    50% {
-      width: 20px;
-      height: 20px;
-    }
-  }
+                    0%,
+                    100% {
+                        width: 26px;
+                        height: 26px;
+                    }
 
-  @keyframes toggler-size2 {
-    0%, 100% {
-      width: 26px;
-      height: 26px;
-    }
+                    50% {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
 
-    50% {
-      width: 20px;
-      height: 20px;
-    }
-  }
- </style>
+                @keyframes toggler-size2 {
+
+                    0%,
+                    100% {
+                        width: 26px;
+                        height: 26px;
+                    }
+
+                    50% {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+            </style>

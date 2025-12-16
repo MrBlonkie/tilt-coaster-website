@@ -87,6 +87,19 @@
                             <div id="tiltdrop-connect-status"
                                 class="p-2 w-24 text-center rounded text-white bg-gray-400">Laden...</div>
                         </div>
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-700">Brakes ESP:</span>
+                        <div id="brakes-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
+                            Laden...
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-700">Switchtrack ESP:</span>
+                        <div id="switchtrack-connect-status"
+                            class="p-2 w-24 text-center rounded text-white bg-gray-400">
+                            Laden...
+                        </div>
+                    </div>
                     </div>
                 </div>
 
@@ -127,6 +140,8 @@
             client.subscribe([
                 'rollercoaster/station/status',
                 'rollercoaster/tiltdrop/status',
+                'rollercoaster/brakes/status',
+                'rollercoaster/switchtrack/status',
                 'rollercoaster/event',
                 'station/status',
                 'tiltdrop/status'
@@ -139,6 +154,8 @@
 
         client.publish('station/manual', 'off');
         client.publish('tiltdrop/manual', 'off');
+        client.publish('brakes/manual', 'off');
+        client.publish('switchtrack/manual', 'off');
 
         client.on('message', (topic, payload) => {
             const msg = payload.toString().trim();
@@ -152,6 +169,16 @@
             if (topic === 'rollercoaster/tiltdrop/status') {
                 if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
                 setConnectStatus('tiltdrop', 'online');
+                return;
+            }
+            if (topic === 'rollercoaster/brakes/status') {
+                if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
+                setConnectStatus('brakes', 'online');
+                return;
+            }
+            if (topic === 'rollercoaster/switchtrack/status') {
+                if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
+                setConnectStatus('switchtrack', 'online');
                 return;
             }
 
@@ -177,6 +204,8 @@
 
             if (topic === 'station/status') updateStationUI(data);
             if (topic === 'tiltdrop/status') updateTiltdropUI(data);
+            if (topic === 'brakes/status') updateBrakesUI(data);
+            if (topic === 'switchtrack/status') updateSwitchtrackdropUI(data);
         });
 
 
@@ -184,6 +213,8 @@
         setInterval(() => {
             if (Date.now() - lastStationHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('station', 'offline');
             if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('tiltdrop', 'offline');
+            if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('brakes', 'offline');
+            if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('switchtrack', 'offline');
         }, 1000);
 
 

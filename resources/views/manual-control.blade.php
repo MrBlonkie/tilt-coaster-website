@@ -81,7 +81,7 @@
 
                 <div class="space-y-4">
 
-                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'stationfan', 'label' => 'STATION FAN', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
+                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
                         <x-control-card showStatus>
                             <p class="text-gray-500 text-sm">{{ $motor['label'] }}</p>
 
@@ -172,31 +172,31 @@
                 2);
         }
 
+        function getNested(obj, path) {
+            return path.reduce((o, k) => (o && o[k] !== undefined) ? o[k] : undefined, obj);
+        }
+
+
         function updateMotorUI() {
             const map = [{
                     id: 'stationmotor',
                     esp: 'station',
-                    field: 'stationMotorState'
+                    path: ['motors', 'station', 'stationStepperState']
                 },
                 {
                     id: 'lifthillmotor',
                     esp: 'station',
-                    field: 'liftMotorState'
+                    path: ['motors', 'lift', 'liftStepperState']
                 },
                 {
                     id: 'tiltdropmotor',
                     esp: 'tiltdrop',
-                    field: 'isTiltdropTrackOpen'
+                    type: 'tiltdrop'
                 },
                 {
                     id: 'releasedropmotor',
                     esp: 'tiltdrop',
-                    field: 'releasedropMotorState'
-                },
-                {
-                    id: 'stationfan',
-                    esp: 'station',
-                    field: 'relayState'
+                    path: ['tiltdrop', 'releasedropMotorState']
                 },
                 {
                     id: 'switchtrackmotor',
@@ -208,7 +208,7 @@
                 {
                     id: 'releaseswitchtrackmotor',
                     esp: 'switchtrack',
-                    field: 'releaseswitchMotorState'
+                    path: ['switchtrack', 'releaseswitchMotorState']
                 },
             ];
 
@@ -218,12 +218,17 @@
 
                 el.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-gray-400');
 
+                const val = m.path ?
+                    getNested(currentStatus[m.esp], m.path) :
+                    currentStatus[m.esp]?.[m.field];
+
+
                 // Speciale UI handling voor switchtrack rotateTarget
                 if (m.type === 'switchtrack') {
-                    const moving = currentStatus.switchtrack?.isSwitchtrackMoving;
-                    const target = currentStatus.switchtrack?.rotateTarget;
+                    const moving = getNested(currentStatus.switchtrack, ['switchtrack', 'isSwitchtrackMoving']);
+                    const target = getNested(currentStatus.switchtrack, ['switchtrack', 'manualRotateTarget']);
 
-                    if (moving === true) {
+                    if (moving) {
                         el.classList.add('bg-yellow-500');
                         el.innerText = 'MOVING';
                     } else if (target === 'station') {
@@ -234,15 +239,15 @@
                         el.innerText = 'BRAKES';
                     } else {
                         el.classList.add('bg-gray-400');
-                        el.innerText = 'Laden...';
+                        el.innerText = 'UNKNOWN';
                     }
                     return;
                 }
 
-                if (m.id === 'tiltdropmotor') {
-                    const moving = currentStatus.tiltdrop?.tiltdropMotorMoving;
-                    const open = currentStatus.tiltdrop?.isTiltdropTrackOpen;
-                    const closed = currentStatus.tiltdrop?.hallSensorTiltdropClosed;
+                if (m.type === 'tiltdrop') {
+                    const moving = getNested(currentStatus.tiltdrop, ['tiltdrop', 'tiltdropMotorMoving']);
+                    const open = getNested(currentStatus.tiltdrop, ['tiltdrop', 'isTiltdropTrackOpen']);
+                    const closed = getNested(currentStatus.tiltdrop, ['sensors', 'hallSensorTiltdropClosedState']);
 
                     if (moving) {
                         el.classList.add('bg-red-500');
@@ -255,15 +260,10 @@
                         el.innerText = 'CLOSED';
                     } else {
                         el.classList.add('bg-gray-400');
-                        el.innerText = 'Laden...';
+                        el.innerText = 'UNKNOWN';
                     }
-
-                    return; // stop verdere verwerking voor dit element
+                    return;
                 }
-
-
-                // Standaard boolean motor UI
-                const val = currentStatus[m.esp]?.[m.field];
 
                 if (val === true) {
                     el.classList.add('bg-green-500');
@@ -289,8 +289,8 @@
 
             ['station', 'tiltdrop', 'switchtrack'].forEach(dev => {
                 const toggle = document.getElementById(`manual-switch-${dev}`);
-                if (toggle && typeof currentStatus[dev]?.manualMode !== 'undefined') {
-                    toggle.checked = currentStatus[dev].manualMode;
+                if (toggle && typeof currentStatus[dev]?.mode.manualMode !== 'undefined') {
+                    toggle.checked = currentStatus[dev].mode.manualMode;
                 }
             });
         }

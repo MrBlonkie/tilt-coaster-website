@@ -9,19 +9,12 @@ use App\Models\MqttMessage;
 
 class ManualControlController extends Controller
 {
-    private $espStationIp;
-    private $espTiltDropIp;
-
-    public function __construct()
-    {
-        $this->espStationIp = env('ESP_STATION_IP');
-        $this->espTiltDropIp = env('ESP_TILTDROP_IP');
-    }
 
     public function index()
     {
         $stationJson = Cache::get('mqtt_last_station/status');
         $tiltdropJson = Cache::get('mqtt_last_tiltdrop/status');
+        $brakesJson = Cache::get('mqtt_last_brakes/status');
         $switchtrackJson = Cache::get('mqtt_last_switchtrack/status');
         
         // === HEARTBEAT AANPASSING START ===
@@ -29,6 +22,7 @@ class ManualControlController extends Controller
         // met behulp van de Heartbeat-timer. We zetten de initiële waarden op 'unknown'.
         $stationOnline = 'unknown';
         $tiltdropOnline = 'unknown';
+        $brakesOnline = 'unknown';
         $switchtrackOnline = 'unknown';
         // === HEARTBEAT AANPASSING EIND ===
 
@@ -39,15 +33,19 @@ class ManualControlController extends Controller
         if (!$tiltdropJson) {
             $tiltdropJson = MqttMessage::where('topic', 'tiltdrop/status')->latest()->value('message');
         }
+        if (!$brakesJson) {
+            $brakesJson = MqttMessage::where('topic', 'brakes/status')->latest()->value('message');
+        }
         if (!$switchtrackJson) {
             $switchtrackJson = MqttMessage::where('topic', 'switchtrack/status')->latest()->value('message');
         }
 
         $station = $stationJson ? json_decode($stationJson, true) : null;
         $tiltdrop = $tiltdropJson ? json_decode($tiltdropJson, true) : null;
+        $brakes = $brakesJson ? json_decode($brakesJson, true) : null;
         $switchtrack = $switchtrackJson ? json_decode($switchtrackJson, true) : null;
 
-        return view('manual-control', compact('station', 'tiltdrop', 'switchtrack', 'stationOnline', 'tiltdropOnline', 'switchtrackOnline'));
+        return view('manual-control', compact('station', 'tiltdrop', 'brakes', 'switchtrack', 'stationOnline', 'tiltdropOnline', 'brakesOnline', 'switchtrackOnline'));
     }
 
 }

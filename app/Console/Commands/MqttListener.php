@@ -35,9 +35,11 @@ class MqttListener extends Command
         $topics = [
             'station/status',
             'tiltdrop/status',
+            'brakes/status',
             'switchtrack/status',
             'rollercoaster/station/status',
             'rollercoaster/tiltdrop/status',
+            'rollercoaster/brakes/status',
             'rollercoaster/switchtrack/status',
         ];
 

@@ -52,6 +52,17 @@
             <canvas id="tiltdrop-monitor" height="60" class="w-full bg-black rounded"></canvas>
         </div>
 
+        {{-- Brakes Monitor --}}
+        <div>
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-medium text-gray-300">Brakes ESP:</span>
+                <span id="brakes-connect-status" class="font-semibold text-gray-500 text-sm">
+                    INIT...
+                </span>
+            </div>
+            <canvas id="brakes-monitor" height="60" class="w-full bg-black rounded"></canvas>
+        </div>
+
         {{-- Switchtrack Monitor --}}
         <div>
             <div class="flex justify-between items-center mb-1">
@@ -148,6 +159,7 @@
         const monitor =
             device === 'station' ? stationMonitor :
             device === 'tiltdrop' ? tiltdropMonitor :
+            device === 'brakes' ? brakesMonitor :
             device === 'switchtrack' ? switchtrackMonitor :
             null;
 
@@ -183,6 +195,7 @@
         const monitor =
             device === 'station' ? stationMonitor :
             device === 'tiltdrop' ? tiltdropMonitor :
+            device === 'brakes' ? brakesMonitor :
             device === 'switchtrack' ? switchtrackMonitor :
             null;
 
@@ -220,12 +233,13 @@
         console.log('MQTT connected!');
         client.subscribe('rollercoaster/station/status');
         client.subscribe('rollercoaster/tiltdrop/status');
+        client.subscribe('rollercoaster/brakes/status');
         client.subscribe('rollercoaster/switchtrack/status');
         client.subscribe('rollercoaster/log');
         client.subscribe('rollercoaster/estop');
         addLogEntry('MQTT', 'Verbonden met de broker.', 'success');
 
-        ['station','tiltdrop','switchtrack'].forEach(dev => {
+        ['station','tiltdrop', 'brakes', 'switchtrack'].forEach(dev => {
             if (HEARTBEAT_TIMERS[dev]) clearTimeout(HEARTBEAT_TIMERS[dev]);
             HEARTBEAT_TIMERS[dev] = setTimeout(() => {
                 setConnectStatus(dev, 'offline');
@@ -244,6 +258,9 @@
         if (topic === 'rollercoaster/tiltdrop/status' && msg.toLowerCase() === 'online') {
             resetHeartbeatTimer('tiltdrop'); return;
         }
+        if (topic === 'rollercoaster/brakes/status' && msg.toLowerCase() === 'online') {
+            resetHeartbeatTimer('brakes'); return;
+        }
         if (topic === 'rollercoaster/switchtrack/status' && msg.toLowerCase() === 'online') {
             resetHeartbeatTimer('switchtrack'); return;
         }
@@ -260,10 +277,12 @@
     document.addEventListener('DOMContentLoaded', () => {
         stationMonitor = new HeartbeatMonitor('station-monitor');
         tiltdropMonitor = new HeartbeatMonitor('tiltdrop-monitor');
+        brakesMonitor = new HeartbeatMonitor('brakes-monitor');
         switchtrackMonitor = new HeartbeatMonitor('switchtrack-monitor');
 
         setConnectStatus('station', 'unknown');
         setConnectStatus('tiltdrop', 'unknown');
+        setConnectStatus('brakes', 'unknown');
         setConnectStatus('switchtrack', 'unknown');
 
         const firstLog = logList.querySelector('li');

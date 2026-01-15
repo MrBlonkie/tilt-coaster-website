@@ -67,6 +67,9 @@
                         <p class="text-gray-400 mt-4 mb-1">TILTDROP:</p>
                         <pre id="tiltdrop-json-output">{{ json_encode($tiltdrop, JSON_PRETTY_PRINT) }}</pre>
 
+                        <p class="text-gray-400 mt-4 mb-1">BRAKES:</p>
+                        <pre id="brakes-json-output">{{ json_encode($brakes, JSON_PRETTY_PRINT) }}</pre>
+
                         <p class="text-gray-400 mt-4 mb-1">SWITCHTRACK:</p>
                         <pre id="switchtrack-json-output">{{ json_encode($switchtrack ?? [], JSON_PRETTY_PRINT) }}</pre>
 
@@ -125,9 +128,11 @@
         const currentStatus = {
             station: {},
             tiltdrop: {},
+            brakes: {},
             switchtrack: {},
             stationLwt: '{{ $stationOnline }}',
             tiltdropLwt: '{{ $tiltdropOnline }}',
+            brakesLwt: '{{ $brakesOnline }}',
             switchtrackLwt: '{{ $switchtrackOnline }}'
         };
 
@@ -135,6 +140,7 @@
         const HEARTBEAT_TIMERS = {
             station: null,
             tiltdrop: null,
+            brakes: null,
             switchtrack: null
         };
 
@@ -168,6 +174,7 @@
         function updateJsonUI() {
             document.getElementById('station-json-output').innerText = JSON.stringify(currentStatus.station, null, 2);
             document.getElementById('tiltdrop-json-output').innerText = JSON.stringify(currentStatus.tiltdrop, null, 2);
+            document.getElementById('brakes-json-output').innerText = JSON.stringify(currentStatus.brakes, null, 2);
             document.getElementById('switchtrack-json-output').innerText = JSON.stringify(currentStatus.switchtrack, null,
                 2);
         }
@@ -282,12 +289,13 @@
         function updateAllUI() {
             setConnectStatus('station', currentStatus.stationLwt);
             setConnectStatus('tiltdrop', currentStatus.tiltdropLwt);
+            setConnectStatus('brakes', currentStatus.brakesLwt);
             setConnectStatus('switchtrack', currentStatus.switchtrackLwt);
 
             updateMotorUI();
             updateJsonUI();
 
-            ['station', 'tiltdrop', 'switchtrack'].forEach(dev => {
+            ['station', 'tiltdrop', 'brakes', 'switchtrack'].forEach(dev => {
                 const toggle = document.getElementById(`manual-switch-${dev}`);
                 if (toggle && typeof currentStatus[dev]?.mode.manualMode !== 'undefined') {
                     toggle.checked = currentStatus[dev].mode.manualMode;
@@ -298,14 +306,17 @@
         client.on('connect', () => {
             client.subscribe('rollercoaster/station/status');
             client.subscribe('rollercoaster/tiltdrop/status');
+            client.subscribe('rollercoaster/brakes/status');
             client.subscribe('rollercoaster/switchtrack/status');
 
             client.subscribe('station/status');
             client.subscribe('tiltdrop/status');
+            client.subscribe('brakes/status');
             client.subscribe('switchtrack/status');
 
             resetHeartbeatTimer('station');
             resetHeartbeatTimer('tiltdrop');
+            resetHeartbeatTimer('brakes');
             resetHeartbeatTimer('switchtrack');
         });
 
@@ -315,6 +326,8 @@
             if (topic === 'rollercoaster/station/status' && msg === 'online') return resetHeartbeatTimer('station');
             if (topic === 'rollercoaster/tiltdrop/status' && msg === 'online') return resetHeartbeatTimer(
                 'tiltdrop');
+                if (topic === 'rollercoaster/brakes/status' && msg === 'online') return resetHeartbeatTimer(
+                'brakes');
             if (topic === 'rollercoaster/switchtrack/status' && msg === 'online') return resetHeartbeatTimer(
                 'switchtrack');
 
@@ -323,6 +336,7 @@
 
                 if (topic === 'station/status') currentStatus.station = data;
                 if (topic === 'tiltdrop/status') currentStatus.tiltdrop = data;
+                if (topic === 'brakes/status') currentStatus.brakes = data;
                 if (topic === 'switchtrack/status') currentStatus.switchtrack = data;
 
                 updateAllUI();
@@ -334,6 +348,9 @@
         );
         document.getElementById('manual-switch-tiltdrop')?.addEventListener('change', e =>
             client.publish('tiltdrop/manual', e.target.checked ? 'on' : 'off')
+        );
+        document.getElementById('manual-switch-brakes')?.addEventListener('change', e =>
+            client.publish('brakes/manual', e.target.checked ? 'on' : 'off')
         );
         document.getElementById('manual-switch-switchtrack')?.addEventListener('change', e =>
             client.publish('switchtrack/manual', e.target.checked ? 'on' : 'off')

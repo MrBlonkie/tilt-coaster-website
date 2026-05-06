@@ -7,10 +7,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {{-- KOLOM 1: VISUELE BAAN (MIMIC PANEL) --}}
-
-            <div class="lg:col-span-2 bg-white shadow rounded-lg p-6">
+            <div class="lg:col-span-2 bg-white shadow rounded-lg p-6 overflow-x-auto">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Mimic Panel</h2>
-                <svg width="910" height="488" viewBox="0 0 910 488" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="910" height="488" viewBox="0 0 910 488" fill="none" xmlns="http://www.w3.org/2000/svg" class="min-w-[600px]">
                     <g id="Group 1">
                         <rect id="station-stroke" x="67" y="95" width="10" height="240" fill="#D9D9D9" />
                         <rect id="lifthill-stroke" x="123" y="52" width="10" height="552"
@@ -42,125 +41,103 @@
                             stroke="#D9D9D9" stroke-width="3" />
                         <rect id="tiltdrop-block-section" x="688.5" y="1.5" width="220" height="137"
                             stroke="#D9D9D9" stroke-width="3" />
-
                     </g>
                 </svg>
-
-
-
-
-
             </div>
 
+            {{-- RECHTERKOLOM: CONNECTIES & CONTROLS --}}
+            <div class="space-y-4">
 
-            {{-- Connection Card --}}
-            <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Connecties</h2>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-700">Station ESP:</span>
-                        <div id="station-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
-                            Laden...</div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-700">Tiltdrop ESP:</span>
-                        <div id="tiltdrop-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
-                            Laden...</div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-700">Brakes ESP:</span>
-                        <div id="brakes-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">
-                            Laden...
+                {{-- Connection Card --}}
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Connecties</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-700">Station ESP:</span>
+                            <div id="station-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">Laden...</div>
                         </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-700">Switchtrack ESP:</span>
-                        <div id="switchtrack-connect-status"
-                            class="p-2 w-24 text-center rounded text-white bg-gray-400">
-                            Laden...
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-700">Tiltdrop ESP:</span>
+                            <div id="tiltdrop-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">Laden...</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-700">Brakes ESP:</span>
+                            <div id="brakes-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">Laden...</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-700">Switchtrack ESP:</span>
+                            <div id="switchtrack-connect-status" class="p-2 w-24 text-center rounded text-white bg-gray-400">Laden...</div>
                         </div>
                     </div>
                 </div>
-                <div class="">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">ESP Resets</h2>
+
+                {{-- ESP Resets --}}
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">ESP Resets</h2>
                     <div class="space-y-2">
-                        <button data-esp="station"
-                            class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded">
-                            Clear Station
+                        <button data-esp="station" class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded transition">Clear Station</button>
+                        <button data-esp="lifthill" class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded transition">Clear Lifthill</button>
+                        <button data-esp="tiltdrop" class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded transition">Clear Tiltdrop</button>
+                        <button data-esp="brakes" class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded transition">Clear Brakes</button>
+                        <button data-esp="switchtrack" class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded transition">Clear Switchtrack</button>
+                    </div>
+                </div>
+
+                {{-- Controls --}}
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">Controls</h2>
+                    <div class="space-y-3">
+                        <button id="dispatch-button"
+                            class="w-full text-white font-bold py-4 px-4 rounded-lg text-lg transition duration-200 bg-green-600 hover:bg-green-700">
+                            GO
                         </button>
-                        <button data-esp="lifthill"
-                            class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded">
-                            Clear Lifthill
-                        </button>
-                        <button data-esp="tiltdrop"
-                            class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded">
-                            Clear Tiltdrop
-                        </button>
-                        <button data-esp="brakes"
-                            class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded">
-                            Clear Brakes
-                        </button>
-                        <button data-esp="switchtrack"
-                            class="clear-btn w-full bg-yellow-400 hover:bg-yellow-500 font-bold py-2 rounded">
-                            Clear Switchtrack
+                        <button id="estop-button"
+                            class="w-full text-white font-bold py-4 px-4 rounded-lg text-lg transition duration-200 bg-red-600 hover:bg-red-700">
+                            EMERGENCY STOP
                         </button>
                     </div>
                 </div>
-            </div>
 
-
-            {{-- Controls Card --}}
-            <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Controls</h2>
-                <div class="space-y-4">
-                    <button id="dispatch-button"
-                        class="w-full text-white font-bold py-3 px-4 rounded transition duration-300 ease-in-out bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed">DISPATCH</button>
-                    <button id="estop-button"
-                        class="w-full text-white font-bold py-3 px-4 rounded transition duration-300 ease-in-out bg-red-600 hover:bg-red-700">EMERGENCY
-                        STOP</button>
-
-
-                </div>
             </div>
 
         </div>
 
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        {{-- Kolom 1: Algemene Events --}}
-        <div class="bg-black rounded-lg p-4 shadow">
-            <h2 class="text-lg font-semibold mb-2 text-blue-400">System Events</h2>
-            <div id="eventLogs" class="h-64 overflow-y-auto font-mono text-sm text-blue-400 space-y-1"></div>
+        {{-- LOGS --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div class="bg-black rounded-lg p-4 shadow">
+                <h2 class="text-lg font-semibold mb-2 text-blue-400">System Events</h2>
+                <div id="eventLogs" class="h-64 overflow-y-auto font-mono text-sm text-blue-400 space-y-1"></div>
+            </div>
+            <div class="bg-black rounded-lg p-4 shadow">
+                <h2 class="text-lg font-semibold mb-2 text-green-400">Block Logic Logs</h2>
+                <div id="blockLogs" class="h-64 overflow-y-auto font-mono text-sm text-green-400 space-y-1"></div>
+            </div>
         </div>
-
-        {{-- Kolom 2: Block Events --}}
-        <div class="bg-black rounded-lg p-4 shadow">
-            <h2 class="text-lg font-semibold mb-2 text-green-400">Block Logic Logs</h2>
-            <div id="blockLogs" class="h-64 overflow-y-auto font-mono text-sm text-green-400 space-y-1"></div>
-        </div>
-    </div>
 
     </div>
 
     <script>
-        // === Heartbeat tracking ===
+        // === Heartbeat tracking (één variabele per device) ===
         let lastStationHeartbeat = 0;
         let lastTiltdropHeartbeat = 0;
-        const HEARTBEAT_TIMEOUT = 5000; // 5 seconden
+        let lastBrakesHeartbeat = 0;
+        let lastSwitchtrackHeartbeat = 0;
+        const HEARTBEAT_TIMEOUT = 5000;
 
-        let dispatchState = 'stop'; // 'go' | 'stop'
-        const ESP_DEVICES = ['station', 'tiltdrop', 'brakes', 'switchtrack'];
-
+        let dispatchState = 'stop';
         const lastLogCache = {};
-        const LOG_DEDUP_WINDOW = 1000; // ms
+        const LOG_DEDUP_WINDOW = 1000;
 
+        // Rate limiting voor kritieke knoppen
+        let lastDispatchClick = 0;
+        let lastEstopClick = 0;
+        const BUTTON_COOLDOWN = 1000;
 
         // === MQTT CLIENT SETUP ===
         const MQTT_HOST = "{{ env('PI_IP') }}";
         const client = mqtt.connect(`ws://${MQTT_HOST}:9001`);
 
         client.on('connect', () => {
-            console.log('MQTT connected!');
             client.subscribe([
                 'rollercoaster/station/status',
                 'rollercoaster/tiltdrop/status',
@@ -169,10 +146,11 @@
                 'rollercoaster/event',
                 'station/status',
                 'tiltdrop/status',
+                'brakes/status',
+                'switchtrack/status',
                 'rollercoaster/block/event',
             ]);
 
-            // Initialiseer connectie status
             setConnectStatus('station', 'unknown');
             setConnectStatus('tiltdrop', 'unknown');
             setConnectStatus('brakes', 'unknown');
@@ -199,35 +177,32 @@
                 return;
             }
             if (topic === 'rollercoaster/brakes/status') {
-                if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
+                if (msg.toLowerCase() === 'online') lastBrakesHeartbeat = Date.now();
                 setConnectStatus('brakes', 'online');
                 return;
             }
             if (topic === 'rollercoaster/switchtrack/status') {
-                if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
+                if (msg.toLowerCase() === 'online') lastSwitchtrackHeartbeat = Date.now();
                 setConnectStatus('switchtrack', 'online');
                 return;
             }
 
             if (topic === 'rollercoaster/block/event') {
-                addLog(msg, "blockLogs"); // Specifiek voor de rechter kolom
+                addLog(msg, 'blockLogs');
             }
 
             if (topic === 'rollercoaster/event') {
-                addLog(msg, "eventLogs"); // Specifiek voor de linker kolom
+                addLog(msg, 'eventLogs');
 
-                // De animaties blijven reageren op de algemene events
                 if (msg.toLowerCase() === 'tiltdrop_opening') animateTiltdrop(true);
                 if (msg.toLowerCase() === 'tiltdrop_resetting') animateTiltdrop(false);
             }
-
 
             // === STATUS BERICHT (JSON only) ===
             let data;
             try {
                 data = JSON.parse(msg);
             } catch (e) {
-                // Niet-JSON (bijv. heartbeat strings) negeren
                 return;
             }
 
@@ -237,16 +212,13 @@
             if (topic === 'switchtrack/status') updateSwitchtrackUI(data);
         });
 
-
-        // === Heartbeat interval ===
+        // === Heartbeat interval (correcte variabelen per device) ===
         setInterval(() => {
             if (Date.now() - lastStationHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('station', 'offline');
             if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('tiltdrop', 'offline');
-            if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('brakes', 'offline');
-            if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('switchtrack', 'offline');
+            if (Date.now() - lastBrakesHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('brakes', 'offline');
+            if (Date.now() - lastSwitchtrackHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('switchtrack', 'offline');
         }, 1000);
-
-
 
         function setConnectStatus(device, status) {
             const el = document.getElementById(`${device}-connect-status`);
@@ -269,66 +241,59 @@
         const dispatchBtn = document.getElementById('dispatch-button');
 
         dispatchBtn.addEventListener('click', () => {
+            const now = Date.now();
+            if (now - lastDispatchClick < BUTTON_COOLDOWN) return;
+            lastDispatchClick = now;
+
             if (dispatchState === 'stop') {
                 client.publish('rollercoaster/dispatch', 'go');
                 dispatchState = 'go';
-                updateDispatchButton();
             } else {
                 client.publish('rollercoaster/dispatch', 'stop');
                 dispatchState = 'stop';
-                updateDispatchButton();
             }
+            updateDispatchButton();
         });
 
         function updateDispatchButton() {
             if (dispatchState === 'go') {
                 dispatchBtn.textContent = 'STOP';
-                dispatchBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-                dispatchBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                dispatchBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                dispatchBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
             } else {
                 dispatchBtn.textContent = 'GO';
-                dispatchBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                dispatchBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                dispatchBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+                dispatchBtn.classList.add('bg-green-600', 'hover:bg-green-700');
             }
         }
 
         document.querySelectorAll('.clear-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const esp = btn.dataset.esp;
-                const topic = `rollercoaster/clear/${esp}`;
-                client.publish(topic, 'clear');
-                appendLogMessage(`CLEAR gestuurd naar ${esp.toUpperCase()}`);
+                client.publish(`rollercoaster/clear/${esp}`, 'clear');
+                addLog(`CLEAR gestuurd naar ${esp.toUpperCase()}`, 'eventLogs');
             });
         });
 
-
-
         document.getElementById('estop-button').addEventListener('click', () => {
-            console.log('Publishing: rollercoaster/estop -> true');
+            const now = Date.now();
+            if (now - lastEstopClick < BUTTON_COOLDOWN) return;
+            lastEstopClick = now;
             client.publish('rollercoaster/estop', 'true');
         });
 
-
-        //event log script
-        const eventLogs = document.getElementById("eventLogs");
-
-        function addLog(message, targetId = "eventLogs") {
+        // === LOG ===
+        function addLog(message, targetId = 'eventLogs') {
             const now = Date.now();
             const key = `${targetId}:${message}`;
 
-            if (
-                lastLogCache[key] &&
-                now - lastLogCache[key] < LOG_DEDUP_WINDOW
-            ) {
-                return; // drop spam
-            }
-
+            if (lastLogCache[key] && now - lastLogCache[key] < LOG_DEDUP_WINDOW) return;
             lastLogCache[key] = now;
 
             const logContainer = document.getElementById(targetId);
             if (!logContainer) return;
 
-            const entry = document.createElement("div");
+            const entry = document.createElement('div');
             const timestamp = new Date().toLocaleTimeString();
             entry.textContent = `[${timestamp}] ${message}`;
 
@@ -336,110 +301,75 @@
             logContainer.scrollTop = logContainer.scrollHeight;
         }
 
-
-        // Zet fill-kleur op een SVG shape
+        // === SVG HELPERS ===
         function setFill(id, color) {
             const el = document.getElementById(id);
-            if (!el) return;
-            el.setAttribute("fill", color);
+            if (el) el.setAttribute('fill', color);
         }
 
-        // Zet stroke-kleur op een shape (voor paden)
         function setStroke(id, color) {
             const el = document.getElementById(id);
-            if (!el) return;
-            el.setAttribute("stroke", color);
-        }
-
-        // Zet een shape even te knipperen (optioneel)
-        function flash(id, color = "yellow", duration = 300) {
-            const el = document.getElementById(id);
-            if (!el) return;
-
-            const old = el.getAttribute("fill");
-            el.setAttribute("fill", color);
-
-            setTimeout(() => {
-                el.setAttribute("fill", old);
-            }, duration);
+            if (el) el.setAttribute('stroke', color);
         }
 
         function updateStationUI(data) {
             if (!data) return;
-
-            setFill("station-stroke", data.blocks.isStationOccupied ? "#d652f7ff" : "#00FF00");
-            setStroke("station-lifthill-turn", data.cartOnTurn ? "#d652f7ff" : "#00FF00");
-            setFill("lifthill-stroke", data.blocks.isLifthillOccupied ? "#d652f7ff" : "#00FF00");
-
-            setStroke("station-block-section", data.blocks.isStationOccupied ? "#d652f7ff" : "#00FF00");
-            setFill("text-station", data.blocks.isStationOccupied ? "#d652f7ff" : "#00FF00");
-
-            setStroke("lifthill-block-section", data.blocks.isLifthillOccupied ? "#d652f7ff" : "#00FF00");
-            setFill("text-lifthill", data.blocks.isLifthillOccupied ? "#d652f7ff" : "#00FF00");
-
+            setFill('station-stroke', data.blocks.isStationOccupied ? '#d652f7ff' : '#00FF00');
+            setStroke('station-lifthill-turn', data.cartOnTurn ? '#d652f7ff' : '#00FF00');
+            setFill('lifthill-stroke', data.blocks.isLifthillOccupied ? '#d652f7ff' : '#00FF00');
+            setStroke('station-block-section', data.blocks.isStationOccupied ? '#d652f7ff' : '#00FF00');
+            setFill('text-station', data.blocks.isStationOccupied ? '#d652f7ff' : '#00FF00');
+            setStroke('lifthill-block-section', data.blocks.isLifthillOccupied ? '#d652f7ff' : '#00FF00');
+            setFill('text-lifthill', data.blocks.isLifthillOccupied ? '#d652f7ff' : '#00FF00');
         }
 
         function updateTiltdropUI(data) {
             if (!data) return;
-            setStroke("layout-stroke", data.trainOnLayout ? "#d652f7ff" : "#00FF00");
+            setStroke('layout-stroke', data.trainOnLayout ? '#d652f7ff' : '#00FF00');
+            setStroke('tiltdrop-block-section', data.blocks.isTiltdropOccupied ? '#d652f7ff' : '#00FF00');
+            setFill('text-tiltdrop', data.blocks.isTiltdropOccupied ? '#d652f7ff' : '#00FF00');
+        }
 
-            setStroke("tiltdrop-block-section", data.blocks.isTiltdropOccupied ? "#d652f7ff" : "#00FF00");
-            setFill("text-tiltdrop", data.blocks.isTiltdropOccupied ? "#d652f7ff" : "#00FF00");
+        function updateBrakesUI(data) {
+            if (!data) return;
+            setStroke('brakes-block-section', data.blocks?.isBrakesOccupied ? '#d652f7ff' : '#00FF00');
         }
 
         function updateSwitchtrackUI(data) {
             if (!data) return;
-            setStroke("switchtrack-block-section", data.blocks.isSwitchtrackOccupied ? "#d652f7ff" : "#00FF00");
-            setFill("text-switchtrack", data.blocks.isSwitchtrackOccupied ? "#d652f7ff" : "#00FF00");
-            console.log(data);
+            setStroke('switchtrack-block-section', data.blocks.isSwitchtrackOccupied ? '#d652f7ff' : '#00FF00');
+            setFill('text-switchtrack', data.blocks.isSwitchtrackOccupied ? '#d652f7ff' : '#00FF00');
         }
 
-        // Huidige hoek van de animatie (0 = vlak/gesloten, 90 = drop/open)
+        // === TILTDROP ANIMATIE ===
         let currentTiltAngle = 0;
         let tiltdropAnimating = false;
-
-        // Constanten uit je SVG (Hinge punt)
         const hingeX = 769;
         const hingeY = 97;
-
-        // Constanten van de originele positie (uit de SVG <rect> tag)
-        const baseRotation = "rotate(-90 737.811 97.1158)";
+        const baseRotation = 'rotate(-90 737.811 97.1158)';
 
         function animateTiltdrop(open = true) {
-            const rect = document.getElementById("tiltdrop-stroke");
+            const rect = document.getElementById('tiltdrop-stroke');
             if (!rect || tiltdropAnimating) return;
 
-            // Bepaal doel: 90 graden (naar beneden) of 0 graden (terug vlak)
             const targetAngle = open ? 90 : 0;
-
-            // Als we er al zijn, doe niets
             if (Math.abs(currentTiltAngle - targetAngle) < 0.1) return;
 
             tiltdropAnimating = true;
-            const speed = .5; // Snelheid van de animatie
+            const speed = 0.5;
 
             function step() {
                 let reachedTarget = false;
 
                 if (currentTiltAngle < targetAngle) {
                     currentTiltAngle += speed;
-                    if (currentTiltAngle >= targetAngle) {
-                        currentTiltAngle = targetAngle;
-                        reachedTarget = true;
-                    }
-                } else if (currentTiltAngle > targetAngle) {
+                    if (currentTiltAngle >= targetAngle) { currentTiltAngle = targetAngle; reachedTarget = true; }
+                } else {
                     currentTiltAngle -= speed;
-                    if (currentTiltAngle <= targetAngle) {
-                        currentTiltAngle = targetAngle;
-                        reachedTarget = true;
-                    }
+                    if (currentTiltAngle <= targetAngle) { currentTiltAngle = targetAngle; reachedTarget = true; }
                 }
 
-                // DE FIX: We passen EERST de animatie-rotatie toe rond de Hinge, 
-                // en DAARNA pas de basis-rotatie die het blokje horizontaal legt.
-                // SVG voert transforms van rechts naar links uit (of binnen naar buiten).
-                // Volgorde: Basispositie (-90) -> Dan kantelen (currentAngle)
-                rect.setAttribute("transform", `rotate(${currentTiltAngle} ${hingeX} ${hingeY}) ${baseRotation}`);
+                rect.setAttribute('transform', `rotate(${currentTiltAngle} ${hingeX} ${hingeY}) ${baseRotation}`);
 
                 if (!reachedTarget) {
                     requestAnimationFrame(step);

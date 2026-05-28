@@ -84,7 +84,7 @@
 
                 <div class="space-y-4">
 
-                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
+                    @foreach ([['id' => 'stationmotor', 'label' => 'STATION MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'lifthillmotor', 'label' => 'LIFTHILL MOTOR', 'esp' => 'station', 'actions' => ['on', 'off']], ['id' => 'gatesmotor', 'label' => 'GATES MOTOR', 'esp' => 'station', 'actions' => ['open', 'close']], ['id' => 'tiltdropmotor', 'label' => 'TILTDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'releasedropmotor', 'label' => 'RELEASEDROP MOTOR', 'esp' => 'tiltdrop', 'actions' => ['open', 'close']], ['id' => 'misteffect', 'label' => 'MIST EFFECT', 'esp' => 'tiltdrop', 'actions' => ['on', 'off']], ['id' => 'releasebrakesmotor', 'label' => 'RELEASE BRAKES MOTOR', 'esp' => 'brakes', 'actions' => ['open', 'close']], ['id' => 'switchtrackmotor', 'label' => 'SWITCHTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['brakes', 'station']], ['id' => 'releaseswitchtrackmotor', 'label' => 'RELEASE SWITHCTRACK MOTOR', 'esp' => 'switchtrack', 'actions' => ['open', 'close']]] as $motor)
                         <x-control-card showStatus>
                             <p class="text-gray-500 text-sm">{{ $motor['label'] }}</p>
 
@@ -196,6 +196,11 @@
                     path: ['motors', 'lift', 'liftStepperState']
                 },
                 {
+                    id: 'gatesmotor',
+                    esp: 'station',
+                    path: ['motors', 'station', 'gatesServoState']
+                },
+                {
                     id: 'tiltdropmotor',
                     esp: 'tiltdrop',
                     type: 'tiltdrop'
@@ -204,6 +209,16 @@
                     id: 'releasedropmotor',
                     esp: 'tiltdrop',
                     path: ['tiltdrop', 'releasedropMotorState']
+                },
+                {
+                    id: 'misteffect',
+                    esp: 'tiltdrop',
+                    path: ['tiltdrop', 'misteffectState']
+                },
+                {
+                    id: 'releasebrakesmotor',
+                    esp: 'brakes',
+                    path: ['motors', 'releaseBrakesMotorState']
                 },
                 {
                     id: 'switchtrackmotor',
@@ -365,6 +380,11 @@
                 esp: "station",
                 topic: "station/lifthillmotor"
             },
+            gatesmotor: {
+                esp: "station",
+                topic: "station/gatesmotor",
+                type: "servo"
+            },
             stationfan: {
                 esp: "station",
                 topic: "station/stationfan"
@@ -375,14 +395,19 @@
                 topic: "tiltdrop/tiltdropmotor",
                 type: "servo"
             },
+            misteffect: {
+                esp: "tiltdrop",
+                topic: "tiltdrop/misteffect"
+            },
+
             releasedropmotor: {
                 esp: "tiltdrop",
                 topic: "tiltdrop/releasedropmotor",
                 type: "servo"
             },
             releasebrakesmotor: {
-                esp: "tiltdrop",
-                topic: "tiltdrop/releasebrakesmotor",
+                esp: "brakes",
+                topic: "brakes/releasebrakesmotor",
                 type: "servo"
             },
 

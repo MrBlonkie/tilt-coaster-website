@@ -10,4 +10,9 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        host: 'tilt-coaster-website.test',
+        port: 5400,
+        cors: true,
+    },
 });

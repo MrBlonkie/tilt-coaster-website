@@ -1,5 +1,4 @@
 <x-layout>
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     @vite(['resources/js/pages/auto-control.js'])
 
     <div class="max-w-8xl mx-auto p-4 sm:p-6 lg:p-8">

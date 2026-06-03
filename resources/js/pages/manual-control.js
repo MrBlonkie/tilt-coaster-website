@@ -1,7 +1,8 @@
-/* global mqtt */
+import mqtt from 'mqtt';
 import { createHeartbeatManager } from '../heartbeat.js';
 
-const client = mqtt.connect(`ws://${window.MQTT_HOST}:9001`);
+const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+const client = mqtt.connect(`${protocol}://${window.MQTT_HOST}:9001`);
 
 const currentStatus = {
     station: {},

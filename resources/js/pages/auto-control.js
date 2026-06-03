@@ -1,4 +1,4 @@
-/* global mqtt */
+import mqtt from 'mqtt';
 
 let lastStationHeartbeat = 0;
 let lastTiltdropHeartbeat = 0;
@@ -14,7 +14,8 @@ let lastDispatchClick = 0;
 let lastEstopClick = 0;
 const BUTTON_COOLDOWN = 1000;
 
-const client = mqtt.connect(`ws://${window.MQTT_HOST}:9001`);
+const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+const client = mqtt.connect(`${protocol}://${window.MQTT_HOST}:9001`);
 
 client.on('connect', () => {
     client.subscribe([

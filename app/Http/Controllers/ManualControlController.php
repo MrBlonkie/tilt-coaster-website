@@ -10,16 +10,10 @@ class ManualControlController extends Controller
 
     public function index()
     {
-        $stationJson = Cache::get('mqtt_last_station/status');
-        $tiltdropJson = Cache::get('mqtt_last_tiltdrop/status');
-        $brakesJson = Cache::get('mqtt_last_brakes/status');
-        $switchtrackJson = Cache::get('mqtt_last_switchtrack/status');
-        
-        $stationOnline = 'unknown';
-        $tiltdropOnline = 'unknown';
-        $brakesOnline = 'unknown';
-        $switchtrackOnline = 'unknown';
-
+        $stationJson     = Cache::get('mqtt_last_station_status');
+        $tiltdropJson    = Cache::get('mqtt_last_tiltdrop_status');
+        $brakesJson      = Cache::get('mqtt_last_brakes_status');
+        $switchtrackJson = Cache::get('mqtt_last_switchtrack_status');
 
         if (!$stationJson) {
             $stationJson = MqttMessage::where('topic', 'station/status')->latest()->value('message');
@@ -39,7 +33,7 @@ class ManualControlController extends Controller
         $brakes = $brakesJson ? json_decode($brakesJson, true) : null;
         $switchtrack = $switchtrackJson ? json_decode($switchtrackJson, true) : null;
 
-        return view('manual-control', compact('station', 'tiltdrop', 'brakes', 'switchtrack', 'stationOnline', 'tiltdropOnline', 'brakesOnline', 'switchtrackOnline'));
+        return view('manual-control', compact('station', 'tiltdrop', 'brakes', 'switchtrack'));
     }
 
 }

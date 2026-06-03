@@ -47,20 +47,15 @@ class MqttListener extends Command
             $mqtt->subscribe($topic, function ($topic, $message) {
                 $this->info("Received message on [$topic]: $message");
 
-                // --- 1. Detecteer LWT berichten ---
                 if (str_starts_with($topic, 'rollercoaster/')) {
-                    // Cache LWT status apart
+                    // LWT-berichten apart cachen
                     Cache::put("mqtt_lwt_" . str_replace('/', '_', $topic), $message, now()->addMinutes(10));
                     $this->info("→ LWT cached as mqtt_lwt_" . str_replace('/', '_', $topic));
-                }
-
-                // --- 2. Cache gewone status JSON ---
-                else {
+                } else {
                     Cache::put("mqtt_last_" . str_replace('/', '_', $topic), $message, now()->addHours(6));
                     $this->info("→ Status cached as mqtt_last_" . str_replace('/', '_', $topic));
                 }
 
-                // --- 3. Optioneel loggen in DB ---
                 MqttMessage::create([
                     'topic' => $topic,
                     'message' => $message

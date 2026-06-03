@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\ManualControlController;
 use App\Http\Controllers\AutoControlController;
 use App\Models\MqttMessage;
@@ -10,11 +8,6 @@ use App\Models\MqttMessage;
 Route::get('/', function () {
     return view('home');
 });
-
-Route::get('/test', function () {
-    return view('test');
-});
-
 
 Route::get('/status/latest', function() {
     $station = MqttMessage::where('topic', 'station/status')->latest()->first();

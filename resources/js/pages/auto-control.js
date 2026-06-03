@@ -1,10 +1,5 @@
 import mqtt from 'mqtt';
-
-let lastStationHeartbeat = null;
-let lastTiltdropHeartbeat = null;
-let lastBrakesHeartbeat = null;
-let lastSwitchtrackHeartbeat = null;
-const HEARTBEAT_TIMEOUT = 5000;
+import { createHeartbeatManager } from '../heartbeat.js';
 
 let dispatchState = 'stop';
 const lastLogCache = {};
@@ -16,6 +11,71 @@ const BUTTON_COOLDOWN = 1000;
 
 const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 const client = mqtt.connect(`${protocol}://${window.MQTT_HOST}:9001`);
+
+const monitorMap = {};
+
+class HeartbeatMonitor {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.width = this.canvas.width = this.canvas.offsetWidth;
+        this.height = this.canvas.height;
+        this.baseLine = this.height / 2;
+        this.color = '#374151';
+        this.dataPoints = Array(this.width).fill(this.baseLine);
+        this.pingQueue = [];
+        this.blipPattern = [0, -10, -25, 0, 15, 28, 10, -5, 0];
+        this.blipRequested = false;
+        this.draw();
+    }
+
+    setColor(hexColor) { this.color = hexColor; }
+
+    ping() { this.blipRequested = true; }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+
+        if (this.blipRequested && this.pingQueue.length === 0) {
+            this.pingQueue.push(...this.blipPattern);
+            this.blipRequested = false;
+        }
+
+        this.dataPoints.shift();
+        const newPoint = this.pingQueue.length > 0
+            ? this.baseLine + this.pingQueue.shift()
+            : this.baseLine + (Math.random() * 2 - 1);
+        this.dataPoints.push(newPoint);
+
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.color;
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowBlur = 5;
+        this.ctx.shadowColor = this.color;
+        this.ctx.moveTo(0, this.dataPoints[0]);
+        for (let i = 1; i < this.width; i++) {
+            this.ctx.lineTo(i, this.dataPoints[i]);
+        }
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+
+        requestAnimationFrame(() => this.draw());
+    }
+}
+
+function nowTime() {
+    return new Date().toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+const heartbeat = createHeartbeatManager(
+    device => {
+        setConnectStatus(device, 'online');
+        monitorMap[device]?.ping();
+        const hbEl = document.getElementById(`last-hb-${device}`);
+        if (hbEl) hbEl.textContent = nowTime();
+    },
+    device => setConnectStatus(device, 'offline')
+);
 
 client.on('connect', () => {
     client.subscribe([
@@ -31,10 +91,16 @@ client.on('connect', () => {
         'rollercoaster/block/event',
     ]);
 
-    setConnectStatus('station', 'unknown');
-    setConnectStatus('tiltdrop', 'unknown');
-    setConnectStatus('brakes', 'unknown');
-    setConnectStatus('switchtrack', 'unknown');
+    const brokerEl = document.getElementById('mqtt-broker-status');
+    const sinceEl = document.getElementById('mqtt-connected-since');
+    if (brokerEl) {
+        brokerEl.textContent = 'ONLINE';
+        brokerEl.classList.remove('text-gray-400', 'text-red-400');
+        brokerEl.classList.add('text-emerald-400');
+    }
+    if (sinceEl) sinceEl.textContent = nowTime();
+
+    heartbeat.initAll(['station', 'tiltdrop', 'brakes', 'switchtrack']);
 });
 
 client.publish('station/manual', 'off');
@@ -46,23 +112,19 @@ client.on('message', (topic, payload) => {
     const msg = payload.toString().trim();
 
     if (topic === 'rollercoaster/station/status') {
-        if (msg.toLowerCase() === 'online') lastStationHeartbeat = Date.now();
-        setConnectStatus('station', 'online');
+        if (msg.toLowerCase() === 'online') heartbeat.reset('station');
         return;
     }
     if (topic === 'rollercoaster/tiltdrop/status') {
-        if (msg.toLowerCase() === 'online') lastTiltdropHeartbeat = Date.now();
-        setConnectStatus('tiltdrop', 'online');
+        if (msg.toLowerCase() === 'online') heartbeat.reset('tiltdrop');
         return;
     }
     if (topic === 'rollercoaster/brakes/status') {
-        if (msg.toLowerCase() === 'online') lastBrakesHeartbeat = Date.now();
-        setConnectStatus('brakes', 'online');
+        if (msg.toLowerCase() === 'online') heartbeat.reset('brakes');
         return;
     }
     if (topic === 'rollercoaster/switchtrack/status') {
-        if (msg.toLowerCase() === 'online') lastSwitchtrackHeartbeat = Date.now();
-        setConnectStatus('switchtrack', 'online');
+        if (msg.toLowerCase() === 'online') heartbeat.reset('switchtrack');
         return;
     }
 
@@ -90,33 +152,25 @@ client.on('message', (topic, payload) => {
     if (topic === 'switchtrack/status') updateSwitchtrackUI(data);
 });
 
-setInterval(() => {
-    if (lastStationHeartbeat !== null && Date.now() - lastStationHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('station', 'offline');
-    if (lastTiltdropHeartbeat !== null && Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('tiltdrop', 'offline');
-    if (lastBrakesHeartbeat !== null && Date.now() - lastBrakesHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('brakes', 'offline');
-    if (lastSwitchtrackHeartbeat !== null && Date.now() - lastSwitchtrackHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('switchtrack', 'offline');
-}, 1000);
-
 function setConnectStatus(device, status) {
     const el = document.getElementById(`${device}-connect-status`);
-    const dot = document.getElementById(`${device}-connect-dot`);
+    const monitor = monitorMap[device];
     if (!el) return;
 
-    dot?.classList.remove('bg-green-500', 'bg-red-500', 'bg-gray-300', 'animate-pulse');
-    el.classList.remove('text-green-600', 'text-red-500', 'text-gray-400');
+    el.classList.remove('text-emerald-400', 'text-red-400', 'text-gray-400', 'text-gray-500');
 
     if (status === 'online') {
-        dot?.classList.add('bg-green-500');
-        el.classList.add('text-green-600');
-        el.innerText = 'Online';
+        el.classList.add('text-emerald-400');
+        el.innerText = 'ONLINE';
+        monitor?.setColor('#34d399');
     } else if (status === 'offline') {
-        dot?.classList.add('bg-red-500', 'animate-pulse');
-        el.classList.add('text-red-500');
-        el.innerText = 'Offline';
+        el.classList.add('text-red-400');
+        el.innerText = 'OFFLINE';
+        monitor?.setColor('#f87171');
     } else {
-        dot?.classList.add('bg-gray-300', 'animate-pulse');
-        el.classList.add('text-gray-400');
-        el.innerText = 'Init...';
+        el.classList.add('text-gray-500');
+        el.innerText = 'INIT...';
+        monitor?.setColor('#4b5563');
     }
 }
 
@@ -280,3 +334,15 @@ function animateTiltdrop(open = true) {
 
     requestAnimationFrame(step);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    monitorMap.station     = new HeartbeatMonitor('station-monitor');
+    monitorMap.tiltdrop    = new HeartbeatMonitor('tiltdrop-monitor');
+    monitorMap.brakes      = new HeartbeatMonitor('brakes-monitor');
+    monitorMap.switchtrack = new HeartbeatMonitor('switchtrack-monitor');
+
+    setConnectStatus('station', 'unknown');
+    setConnectStatus('tiltdrop', 'unknown');
+    setConnectStatus('brakes', 'unknown');
+    setConnectStatus('switchtrack', 'unknown');
+});

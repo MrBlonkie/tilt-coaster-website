@@ -143,15 +143,15 @@
                 </div>
             </div>
 
-            {{-- Demo video --}}
+            {{-- Media --}}
             <div class="lg:col-span-2 flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                 <div class="px-5 py-3.5 border-b border-gray-200 shrink-0">
-                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Demo</h2>
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Media</h2>
                 </div>
                 <iframe
                     class="flex-1 min-h-0 w-full"
                     src="https://www.youtube.com/embed/zCFXWvgAUE4"
-                    title="De Vliegende Vlaeminck demo"
+                    title="De Vliegende Vlaeminck Build Journey"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>

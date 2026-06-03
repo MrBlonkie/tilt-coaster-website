@@ -7,7 +7,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>window.MQTT_HOST = "{{ env('PI_IP') }}";</script>
 </head>
-<body class="bg-[#111316] overflow-auto">
+<body class="bg-gray-50">
 <x-header/>
 {{$slot}}
 <x-footer/>

@@ -80,10 +80,16 @@ function setConnectStatus(device, status) {
     }
 }
 
+function nowTime() {
+    return new Date().toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
 const heartbeat = createHeartbeatManager(
     device => {
         setConnectStatus(device, 'online');
         monitorMap[device]?.ping();
+        const hbEl = document.getElementById(`last-hb-${device}`);
+        if (hbEl) hbEl.textContent = nowTime();
     },
     device => {
         setConnectStatus(device, 'offline');
@@ -131,6 +137,15 @@ client.on('connect', () => {
     client.subscribe('rollercoaster/log');
     client.subscribe('rollercoaster/estop');
     addLogEntry('MQTT', 'Verbonden met de broker.');
+
+    const brokerEl = document.getElementById('mqtt-broker-status');
+    const sinceEl = document.getElementById('mqtt-connected-since');
+    if (brokerEl) {
+        brokerEl.textContent = 'ONLINE';
+        brokerEl.classList.remove('text-gray-400', 'text-red-400');
+        brokerEl.classList.add('text-emerald-400');
+    }
+    if (sinceEl) sinceEl.textContent = nowTime();
 
     heartbeat.initAll(['station', 'tiltdrop', 'brakes', 'switchtrack']);
 });

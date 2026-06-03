@@ -15,21 +15,54 @@ const currentStatus = {
     switchtrackLwt: 'unknown',
 };
 
+function setCardEnabled(device, enabled) {
+    const card = document.getElementById(`${device}-card`);
+    if (!card) return;
+    card.classList.toggle('opacity-50', !enabled);
+    card.classList.toggle('pointer-events-none', !enabled);
+}
+
+function activateTab(key) {
+    document.querySelectorAll('.json-tab').forEach(tab => {
+        const isActive = tab.dataset.target === key;
+        tab.style.color = isActive ? 'var(--color-ember)' : '';
+        tab.style.borderBottom = isActive ? '2px solid var(--color-ember)' : '2px solid transparent';
+        tab.classList.toggle('text-gray-500', !isActive);
+    });
+    document.querySelectorAll('[id$="-json-panel"]').forEach(panel => panel.classList.add('hidden'));
+    document.getElementById(`${key}-json-panel`)?.classList.remove('hidden');
+}
+
+function setManualControlsEnabled(device, enabled) {
+    const controls = document.getElementById(`${device}-motor-controls`);
+    if (!controls) return;
+    controls.classList.toggle('opacity-40', !enabled);
+    controls.classList.toggle('pointer-events-none', !enabled);
+}
+
 function setConnectStatus(device, status) {
     currentStatus[`${device}Lwt`] = status;
-    const el = document.getElementById(`${device}-connect-status`);
+    const el  = document.getElementById(`${device}-connect-status`);
+    const dot = document.getElementById(`${device}-connect-dot`);
     if (!el) return;
 
-    el.classList.remove('text-emerald-400', 'text-red-400', 'text-gray-600');
+    el.classList.remove('text-emerald-400', 'text-red-400', 'text-gray-400');
+    dot?.classList.remove('bg-emerald-400', 'bg-red-400', 'bg-gray-300', 'animate-pulse');
+
     if (status === 'online') {
         el.classList.add('text-emerald-400');
         el.innerText = 'ONLINE';
+        dot?.classList.add('bg-emerald-400', 'animate-pulse');
+        setCardEnabled(device, true);
     } else if (status === 'offline') {
         el.classList.add('text-red-400');
         el.innerText = 'OFFLINE';
+        dot?.classList.add('bg-red-400');
+        setCardEnabled(device, false);
     } else {
-        el.classList.add('text-gray-600');
+        el.classList.add('text-gray-400');
         el.innerText = 'INIT...';
+        dot?.classList.add('bg-gray-300');
     }
 }
 
@@ -37,6 +70,8 @@ const heartbeat = createHeartbeatManager(
     device => setConnectStatus(device, 'online'),
     device => setConnectStatus(device, 'offline')
 );
+
+heartbeat.initAll(['station', 'tiltdrop', 'brakes', 'switchtrack']);
 
 function updateJsonUI() {
     document.getElementById('station-json-output').innerText    = JSON.stringify(currentStatus.station, null, 2);
@@ -57,7 +92,7 @@ function updateMotorUI() {
         { id: 'tiltdropmotor',           esp: 'tiltdrop',    type: 'tiltdrop' },
         { id: 'releasedropmotor',        esp: 'tiltdrop',    path: ['tiltdrop', 'releasedropMotorState'] },
         { id: 'switchtrackmotor',        esp: 'switchtrack', field: 'rotateTarget', type: 'switchtrack' },
-        { id: 'releasebrakesmotor',      esp: 'brakes',      path: ['brakes', 'releasebrakesMotorState'] },
+        { id: 'releasebrakesmotor',      esp: 'brakes',      path: ['motors', 'releaseBrakesMotorState'] },
         { id: 'releaseswitchtrackmotor', esp: 'switchtrack', path: ['switchtrack', 'releaseswitchMotorState'] },
     ];
 
@@ -65,7 +100,10 @@ function updateMotorUI() {
         const el = document.getElementById(`${m.id}-status`);
         if (!el) return;
 
-        el.classList.remove('text-emerald-400', 'text-red-400', 'text-yellow-400', 'text-orange-400', 'text-gray-600');
+        el.classList.remove(
+            'text-emerald-400', 'text-red-400', 'text-yellow-400', 'text-orange-400', 'text-gray-600',
+            'bg-emerald-50', 'bg-red-50', 'bg-yellow-50', 'bg-orange-50', 'bg-gray-100'
+        );
 
         const val = m.path
             ? getNested(currentStatus[m.esp], m.path)
@@ -76,16 +114,16 @@ function updateMotorUI() {
             const target = getNested(currentStatus.switchtrack, ['switchtrack', 'manualRotateTarget']);
 
             if (moving) {
-                el.classList.add('text-yellow-400');
+                el.classList.add('text-yellow-400', 'bg-yellow-50');
                 el.innerText = 'MOVING';
             } else if (target === 'station') {
-                el.classList.add('text-emerald-400');
+                el.classList.add('text-emerald-400', 'bg-emerald-50');
                 el.innerText = 'STATION';
             } else if (target === 'brakes') {
-                el.classList.add('text-emerald-400');
+                el.classList.add('text-emerald-400', 'bg-emerald-50');
                 el.innerText = 'BRAKES';
             } else {
-                el.classList.add('text-gray-600');
+                el.classList.add('text-gray-600', 'bg-gray-100');
                 el.innerText = 'UNKNOWN';
             }
             return;
@@ -97,30 +135,30 @@ function updateMotorUI() {
             const closed = getNested(currentStatus.tiltdrop, ['sensors', 'hallSensorTiltdropClosedState']);
 
             if (moving) {
-                el.classList.add('text-red-400');
+                el.classList.add('text-red-400', 'bg-red-50');
                 el.innerText = 'MOVING';
             } else if (open) {
-                el.classList.add('text-orange-400');
+                el.classList.add('text-orange-400', 'bg-orange-50');
                 el.innerText = 'OPEN';
             } else if (closed) {
-                el.classList.add('text-emerald-400');
+                el.classList.add('text-emerald-400', 'bg-emerald-50');
                 el.innerText = 'CLOSED';
             } else {
-                el.classList.add('text-gray-600');
+                el.classList.add('text-gray-600', 'bg-gray-100');
                 el.innerText = 'UNKNOWN';
             }
             return;
         }
 
         if (val === true) {
-            el.classList.add('text-emerald-400');
+            el.classList.add('text-emerald-400', 'bg-emerald-50');
             el.innerText = 'ON';
         } else if (val === false) {
-            el.classList.add('text-red-400');
+            el.classList.add('text-red-400', 'bg-red-50');
             el.innerText = 'OFF';
         } else {
-            el.classList.add('text-gray-600');
-            el.innerText = 'LADEN...';
+            el.classList.add('text-gray-600', 'bg-gray-100');
+            el.innerText = 'UNKNOWN';
         }
     });
 }
@@ -137,7 +175,9 @@ function updateAllUI() {
     ['station', 'tiltdrop', 'brakes', 'switchtrack'].forEach(dev => {
         const toggle = document.getElementById(`manual-switch-${dev}`);
         if (toggle && typeof currentStatus[dev]?.mode?.manualMode !== 'undefined') {
-            toggle.checked = currentStatus[dev].mode.manualMode;
+            const isManual = currentStatus[dev].mode.manualMode;
+            toggle.checked = isManual;
+            setManualControlsEnabled(dev, isManual);
         }
     });
 }
@@ -179,18 +219,19 @@ client.on('message', (topic, payload) => {
     } catch {}
 });
 
-document.getElementById('manual-switch-station')?.addEventListener('change', e =>
-    client.publish('station/manual', e.target.checked ? 'on' : 'off')
-);
-document.getElementById('manual-switch-tiltdrop')?.addEventListener('change', e =>
-    client.publish('tiltdrop/manual', e.target.checked ? 'on' : 'off')
-);
-document.getElementById('manual-switch-brakes')?.addEventListener('change', e =>
-    client.publish('brakes/manual', e.target.checked ? 'on' : 'off')
-);
-document.getElementById('manual-switch-switchtrack')?.addEventListener('change', e =>
-    client.publish('switchtrack/manual', e.target.checked ? 'on' : 'off')
-);
+[
+    ['manual-switch-station',     'station'],
+    ['manual-switch-tiltdrop',    'tiltdrop'],
+    ['manual-switch-brakes',      'brakes'],
+    ['manual-switch-switchtrack', 'switchtrack'],
+].forEach(([id, device]) => {
+    const el = document.getElementById(id);
+    el?.addEventListener('change', e => {
+        client.publish(`${device}/manual`, e.target.checked ? 'on' : 'off');
+        setManualControlsEnabled(device, e.target.checked);
+        if (e.target.checked) activateTab(device);
+    });
+});
 
 const MOTOR_MAP = {
     stationmotor:            { esp: 'station',     topic: 'station/stationmotor' },
@@ -211,11 +252,24 @@ document.querySelectorAll('.js-esp-button').forEach(btn => {
         const config = MOTOR_MAP[target];
         if (!config) return;
 
+        activateTab(config.esp);
+
         const finalAction = config.type === 'servo'
             ? (action === 'on' ? 'open' : 'close')
             : action;
 
         client.publish(config.topic, finalAction);
+    });
+});
+
+document.querySelectorAll('.json-tab').forEach(tab => {
+    tab.addEventListener('click', () => activateTab(tab.dataset.target));
+});
+
+document.querySelectorAll('.js-card-header').forEach(header => {
+    header.addEventListener('click', e => {
+        if (e.target.closest('.toggler')) return;
+        activateTab(header.dataset.espKey);
     });
 });
 

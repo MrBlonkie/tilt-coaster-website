@@ -1,9 +1,9 @@
 import mqtt from 'mqtt';
 
-let lastStationHeartbeat = 0;
-let lastTiltdropHeartbeat = 0;
-let lastBrakesHeartbeat = 0;
-let lastSwitchtrackHeartbeat = 0;
+let lastStationHeartbeat = null;
+let lastTiltdropHeartbeat = null;
+let lastBrakesHeartbeat = null;
+let lastSwitchtrackHeartbeat = null;
 const HEARTBEAT_TIMEOUT = 5000;
 
 let dispatchState = 'stop';
@@ -91,26 +91,32 @@ client.on('message', (topic, payload) => {
 });
 
 setInterval(() => {
-    if (Date.now() - lastStationHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('station', 'offline');
-    if (Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('tiltdrop', 'offline');
-    if (Date.now() - lastBrakesHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('brakes', 'offline');
-    if (Date.now() - lastSwitchtrackHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('switchtrack', 'offline');
+    if (lastStationHeartbeat !== null && Date.now() - lastStationHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('station', 'offline');
+    if (lastTiltdropHeartbeat !== null && Date.now() - lastTiltdropHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('tiltdrop', 'offline');
+    if (lastBrakesHeartbeat !== null && Date.now() - lastBrakesHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('brakes', 'offline');
+    if (lastSwitchtrackHeartbeat !== null && Date.now() - lastSwitchtrackHeartbeat > HEARTBEAT_TIMEOUT) setConnectStatus('switchtrack', 'offline');
 }, 1000);
 
 function setConnectStatus(device, status) {
     const el = document.getElementById(`${device}-connect-status`);
+    const dot = document.getElementById(`${device}-connect-dot`);
     if (!el) return;
 
-    el.classList.remove('bg-green-500', 'bg-red-500', 'bg-gray-400');
+    dot?.classList.remove('bg-green-500', 'bg-red-500', 'bg-gray-300', 'animate-pulse');
+    el.classList.remove('text-green-600', 'text-red-500', 'text-gray-400');
+
     if (status === 'online') {
-        el.classList.add('bg-green-500');
+        dot?.classList.add('bg-green-500');
+        el.classList.add('text-green-600');
         el.innerText = 'Online';
     } else if (status === 'offline') {
-        el.classList.add('bg-red-500');
+        dot?.classList.add('bg-red-500', 'animate-pulse');
+        el.classList.add('text-red-500');
         el.innerText = 'Offline';
     } else {
-        el.classList.add('bg-gray-400');
-        el.innerText = 'Laden...';
+        dot?.classList.add('bg-gray-300', 'animate-pulse');
+        el.classList.add('text-gray-400');
+        el.innerText = 'Init...';
     }
 }
 
@@ -135,12 +141,12 @@ function updateDispatchButton() {
     if (!dispatchBtn) return;
     if (dispatchState === 'go') {
         dispatchBtn.textContent = 'STOP';
-        dispatchBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-        dispatchBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+        dispatchBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'border-emerald-700');
+        dispatchBtn.classList.add('bg-orange-500', 'hover:bg-orange-600', 'border-orange-600');
     } else {
         dispatchBtn.textContent = 'GO';
-        dispatchBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
-        dispatchBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+        dispatchBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600', 'border-orange-600');
+        dispatchBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'border-emerald-700');
     }
 }
 
@@ -171,7 +177,16 @@ function addLog(message, targetId = 'eventLogs') {
 
     const entry = document.createElement('div');
     const timestamp = new Date().toLocaleTimeString();
-    entry.textContent = `[${timestamp}] ${message}`;
+
+    const ts = document.createElement('span');
+    ts.className = 'text-gray-500';
+    ts.textContent = `[${timestamp}] `;
+
+    const msg = document.createElement('span');
+    msg.textContent = message;
+
+    entry.appendChild(ts);
+    entry.appendChild(msg);
 
     logContainer.appendChild(entry);
     logContainer.scrollTop = logContainer.scrollHeight;
@@ -189,31 +204,42 @@ function setStroke(id, color) {
 
 function updateStationUI(data) {
     if (!data) return;
-    setFill('station-stroke', data.blocks.isStationOccupied ? '#d652f7ff' : '#00FF00');
-    setStroke('station-lifthill-turn', data.cartOnTurn ? '#d652f7ff' : '#00FF00');
-    setFill('lifthill-stroke', data.blocks.isLifthillOccupied ? '#d652f7ff' : '#00FF00');
-    setStroke('station-block-section', data.blocks.isStationOccupied ? '#d652f7ff' : '#00FF00');
-    setFill('text-station', data.blocks.isStationOccupied ? '#d652f7ff' : '#00FF00');
-    setStroke('lifthill-block-section', data.blocks.isLifthillOccupied ? '#d652f7ff' : '#00FF00');
-    setFill('text-lifthill', data.blocks.isLifthillOccupied ? '#d652f7ff' : '#00FF00');
+    const sc = data.blocks.isStationOccupied ? '#ef4444' : '#22c55e';
+    const sf = data.blocks.isStationOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
+    const lc = data.blocks.isLifthillOccupied ? '#ef4444' : '#22c55e';
+    const lf = data.blocks.isLifthillOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
+    setFill('station-stroke', sc);
+    setStroke('station-lifthill-turn', data.cartOnTurn ? '#ef4444' : '#22c55e');
+    setFill('lifthill-stroke', lc);
+    setStroke('station-block-section', sc);
+    setFill('station-block-section', sf);
+    setStroke('lifthill-block-section', lc);
+    setFill('lifthill-block-section', lf);
 }
 
 function updateTiltdropUI(data) {
     if (!data) return;
-    setStroke('layout-stroke', data.trainOnLayout ? '#d652f7ff' : '#00FF00');
-    setStroke('tiltdrop-block-section', data.blocks.isTiltdropOccupied ? '#d652f7ff' : '#00FF00');
-    setFill('text-tiltdrop', data.blocks.isTiltdropOccupied ? '#d652f7ff' : '#00FF00');
+    const c = data.blocks.isTiltdropOccupied ? '#ef4444' : '#22c55e';
+    const f = data.blocks.isTiltdropOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
+    setStroke('layout-stroke', data.trainOnLayout ? '#ef4444' : '#22c55e');
+    setStroke('tiltdrop-block-section', c);
+    setFill('tiltdrop-block-section', f);
 }
 
 function updateBrakesUI(data) {
     if (!data) return;
-    setStroke('brakes-block-section', data.blocks?.isBrakesOccupied ? '#d652f7ff' : '#00FF00');
+    const c = data.blocks?.isBrakesOccupied ? '#ef4444' : '#22c55e';
+    const f = data.blocks?.isBrakesOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
+    setStroke('brakes-block-section', c);
+    setFill('brakes-block-section', f);
 }
 
 function updateSwitchtrackUI(data) {
     if (!data) return;
-    setStroke('switchtrack-block-section', data.blocks.isSwitchtrackOccupied ? '#d652f7ff' : '#00FF00');
-    setFill('text-switchtrack', data.blocks.isSwitchtrackOccupied ? '#d652f7ff' : '#00FF00');
+    const c = data.blocks.isSwitchtrackOccupied ? '#ef4444' : '#22c55e';
+    const f = data.blocks.isSwitchtrackOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
+    setStroke('switchtrack-block-section', c);
+    setFill('switchtrack-block-section', f);
 }
 
 let currentTiltAngle = 0;

@@ -4,120 +4,119 @@
     'checked' => false,
 ])
 
-<div class="toggler flex flex-col items-center">  <input type="checkbox"
-        id="{{ $id }}" name="{{ $name }}" {{ $checked ? 'checked' : '' }} {{ $attributes }}>
-        <label for="{{ $id }}" class="mb-2"></label>  <span
-            class="toggler-on"></span>
-            <span class="toggler-off"></span>
-            <div class="text-center"> {{ $slot }}
-                    </div>
-            </div>
+<div class="toggler flex flex-col items-center gap-1.5">
+    <input type="checkbox" id="{{ $id }}" name="{{ $name }}" {{ $checked ? 'checked' : '' }} {{ $attributes }}>
+    <label for="{{ $id }}">
+        <span class="track-off">OFF</span>
+        <span class="track-on">ON</span>
+    </label>
+    <span class="toggler-name">{{ $slot }}</span>
+</div>
 
+<style>
+    .toggler {
+        width: auto;
+    }
 
-            <style>
-                /* From Uiverse.io by mobinkakei */
-                .toggler {
-                    width: 72px;
-                    margin: 40px auto;
-                }
+    .toggler input {
+        display: none;
+    }
 
-                .toggler input {
-                    display: none;
-                }
+    .toggler label {
+        display: block;
+        position: relative;
+        width: 84px;
+        height: 42px;
+        border-radius: 42px;
+        background: #374151;
+        border: 1.5px solid #4b5563;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
 
-                .toggler label {
-                    display: block;
-                    position: relative;
-                    width: 72px;
-                    height: 36px;
-                    border: 1px solid #d6d6d6;
-                    border-radius: 36px;
-                    background: #e4e8e8;
-                    cursor: pointer;
-                }
+    /* Knob */
+    .toggler label::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: white;
+        transform: translateY(-50%);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.2s ease;
+    }
 
-                .toggler label::after {
-                    display: block;
-                    border-radius: 100%;
-                    background-color: #d7062a;
-                    content: '';
-                    animation-name: toggler-size;
-                    animation-duration: 0.15s;
-                    animation-timing-function: ease-out;
-                    animation-direction: forwards;
-                    animation-iteration-count: 1;
-                    animation-play-state: running;
-                }
+    /* Active track */
+    .toggler input:checked + label {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.18);
+    }
 
-                .toggler label::after,
-                .toggler label .toggler-on,
-                .toggler label .toggler-off {
-                    position: absolute;
-                    top: 50%;
-                    left: 25%;
-                    width: 26px;
-                    height: 26px;
-                    transform: translateY(-50%) translateX(-50%);
-                    transition: left 0.15s ease-in-out, background-color 0.2s ease-out, width 0.15s ease-in-out, height 0.15s ease-in-out, opacity 0.15s ease-in-out;
-                }
+    /* Knob slid to right */
+    .toggler input:checked + label::after {
+        left: calc(100% - 36px);
+        box-shadow: 0 1px 6px rgba(29, 78, 216, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
 
-                .toggler input:checked+label::after,
-                .toggler input:checked+label .toggler-on,
-                .toggler input:checked+label .toggler-off {
-                    left: 75%;
-                }
+    /* OFF text — visible by default */
+    .toggler label .track-off {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        font-family: ui-monospace, 'Courier New', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        color: #9ca3af;
+        letter-spacing: 0.08em;
+        opacity: 1;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+        user-select: none;
+    }
 
-                .toggler input:checked+label::after {
-                    background-color: #50ac5d;
-                    animation-name: toggler-size2;
-                }
+    /* ON text — hidden by default */
+    .toggler label .track-on {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        font-family: ui-monospace, 'Courier New', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: 0.08em;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+        user-select: none;
+    }
 
-                .toggler .toggler-on,
-                .toggler .toggler-off {
-                    opacity: 1;
-                    z-index: 2;
-                }
+    .toggler input:checked + label .track-on {
+        opacity: 1;
+    }
 
-                .toggler input:checked+label .toggler-off,
-                .toggler input:not(:checked)+label .toggler-on {
-                    width: 0;
-                    height: 0;
-                    opacity: 0;
-                }
+    .toggler input:checked + label .track-off {
+        opacity: 0;
+    }
 
-                .toggler .path {
-                    fill: none;
-                    stroke: #fefefe;
-                    stroke-width: 7px;
-                    stroke-linecap: round;
-                    stroke-miterlimit: 10;
-                }
+    /* Label below */
+    .toggler .toggler-name {
+        font-family: ui-monospace, 'Courier New', monospace;
+        font-size: 10px;
+        font-weight: 600;
+        color: #6b7280;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: color 0.2s ease;
+    }
 
-                @keyframes toggler-size {
-
-                    0%,
-                    100% {
-                        width: 26px;
-                        height: 26px;
-                    }
-
-                    50% {
-                        width: 20px;
-                        height: 20px;
-                    }
-                }
-
-                @keyframes toggler-size2 {
-
-                    0%,
-                    100% {
-                        width: 26px;
-                        height: 26px;
-                    }
-
-                    50% {
-                        width: 20px;
-                        height: 20px;
-                    }
-                }
-            </style>
+    .toggler input:checked ~ .toggler-name {
+        color: #1d4ed8;
+    }
+</style>

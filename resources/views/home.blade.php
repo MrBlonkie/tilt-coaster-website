@@ -1,298 +1,163 @@
 <x-layout>
-    {{-- We hebben de MQTT client nodig --}}
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    @vite(['resources/js/pages/home.js'])
 
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">Rollercoaster Dashboard</h1>
+
+        {{-- HERO --}}
+        <div class="mb-8">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="h-2 w-2 rounded-full bg-[var(--color-ember)] animate-pulse"></span>
+                <span class="text-xs font-mono text-gray-400 uppercase tracking-widest">Live systeem</span>
+            </div>
+            <h1 class="text-4xl font-bold text-white tracking-tight">Dashboard</h1>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {{-- KOLOM 1: NAVIGATIE --}}
-            <div class="lg:col-span-1 space-y-6">
+            {{-- Rij 1: CTA (col 1) + Log (col 2-3) --}}
 
-                {{-- Navigatie Card --}}
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <h2 class="text-2xl font-semibold text-gray-700 p-6 border-b border-gray-200">Bediening</h2>
-                    <div class="p-6 space-y-4">
-                        <a href="/auto-control"
-                            class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg">
-                            🚀 Auto Control
-                        </a>
-                        <a href="/manual-control"
-                            class="block w-full text-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg">
-                            🔧 Manual Control
-                        </a>
+            {{-- CTA --}}
+            <div class="flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-gray-700 shrink-0">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Bediening</h2>
+                </div>
+                <div class="flex-1 flex flex-col justify-center p-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="/auto-control"
+                        class="flex flex-col items-center gap-2.5 p-4 bg-[var(--color-ember)]/15 hover:bg-[var(--color-ember)]/25 border border-[var(--color-ember)]/30 rounded-xl transition-all text-center group">
+                        <div class="p-2.5 bg-[var(--color-ember)] rounded-lg group-hover:scale-105 transition-transform">
+                            <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Auto</div>
+                            <div class="text-[11px] text-gray-400 leading-tight mt-0.5">Volledig automatisch</div>
+                        </div>
+                    </a>
+                    <a href="/manual-control"
+                        class="flex flex-col items-center gap-2.5 p-4 bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-xl transition-all text-center group">
+                        <div class="p-2.5 bg-gray-600 rounded-lg group-hover:scale-105 transition-transform">
+                            <svg class="h-5 w-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Manueel</div>
+                            <div class="text-[11px] text-gray-400 leading-tight mt-0.5">Handmatige besturing</div>
+                        </div>
+                    </a>
+                </div>
+                </div>
+            </div>
+
+            {{-- Event Log --}}
+            <div class="lg:col-span-2 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-gray-700 flex items-center gap-3 shrink-0">
+                    <div class="flex gap-1.5">
+                        <div class="h-3 w-3 rounded-full bg-red-400"></div>
+                        <div class="h-3 w-3 rounded-full bg-yellow-400"></div>
+                        <div class="h-3 w-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Systeem Log</h2>
+                    <span class="ml-auto text-xs font-mono text-gray-400" id="log-count">0 events</span>
+                </div>
+                <div class="flex-1 flex flex-col p-3 bg-gray-900 min-h-0">
+                    <ul id="event-log-list" class="flex-1 space-y-px overflow-y-auto font-mono text-xs pr-1 min-h-[100px]">
+                        <li class="py-1 px-2 text-gray-500">Wachten op verbinding...</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Rij 2: Systeem Status (col 1) + Demo video (col 2-3) --}}
+
+            {{-- Systeem Status --}}
+            <div class="flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-gray-700 flex items-center justify-between shrink-0">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Systeem Status</h2>
+                    <span class="text-xs font-mono text-gray-500">ESP NODES</span>
+                </div>
+                <div class="p-4 flex flex-col flex-1 space-y-4 overflow-y-auto">
+
+                    {{-- MQTT verbinding --}}
+                    <div class="space-y-1.5 pb-3 border-b border-gray-700 shrink-0">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-mono text-gray-400">MQTT broker</span>
+                            <span id="mqtt-broker-status" class="text-xs font-mono font-bold text-gray-400">CONNECTING...</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-mono text-gray-500">Connected since</span>
+                            <span id="mqtt-connected-since" class="text-xs font-mono text-gray-400">...</span>
+                        </div>
+                    </div>
+
+                    {{-- Nodes --}}
+                    <div class="space-y-5">
+
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Station ESP</span>
+                                    <span id="last-hb-station" class="text-[10px] font-mono text-gray-500">...</span>
+                                </div>
+                                <span id="station-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
+                            </div>
+                            <canvas id="station-monitor" height="48" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Tiltdrop ESP</span>
+                                    <span id="last-hb-tiltdrop" class="text-[10px] font-mono text-gray-500">...</span>
+                                </div>
+                                <span id="tiltdrop-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
+                            </div>
+                            <canvas id="tiltdrop-monitor" height="48" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Brakes ESP</span>
+                                    <span id="last-hb-brakes" class="text-[10px] font-mono text-gray-500">...</span>
+                                </div>
+                                <span id="brakes-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
+                            </div>
+                            <canvas id="brakes-monitor" height="48" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Switchtrack ESP</span>
+                                    <span id="last-hb-switchtrack" class="text-[10px] font-mono text-gray-500">...</span>
+                                </div>
+                                <span id="switchtrack-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
+                            </div>
+                            <canvas id="switchtrack-monitor" height="48" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
+                        </div>
+
                     </div>
                 </div>
-
-                {{-- Systeem Status Card (AANGEPASTE VERSIE) --}}
-<div class="bg-gray-900 shadow rounded-lg p-6">
-    <h2 class="text-2xl font-semibold mb-4 text-gray-200">Systeem Status</h2>
-    <div class="space-y-4">
-        
-        {{-- Station Monitor --}}
-        <div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="font-medium text-gray-300">Station ESP:</span>
-                <span id="station-connect-status" class="font-semibold text-gray-500 text-sm">
-                    INIT...
-                </span>
             </div>
-            <canvas id="station-monitor" height="60" class="w-full bg-black rounded"></canvas>
-        </div>
 
-        {{-- Tiltdrop Monitor --}}
-        <div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="font-medium text-gray-300">Tiltdrop ESP:</span>
-                <span id="tiltdrop-connect-status" class="font-semibold text-gray-500 text-sm">
-                    INIT...
-                </span>
+            {{-- Media --}}
+            <div class="lg:col-span-2 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-gray-700 shrink-0">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Media</h2>
+                </div>
+                <iframe
+                    class="flex-1 min-h-0 w-full"
+                    src="https://www.youtube.com/embed/zCFXWvgAUE4"
+                    title="De Vliegende Vlaeminck Build Journey"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
             </div>
-            <canvas id="tiltdrop-monitor" height="60" class="w-full bg-black rounded"></canvas>
-        </div>
-
-        {{-- Brakes Monitor --}}
-        <div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="font-medium text-gray-300">Brakes ESP:</span>
-                <span id="brakes-connect-status" class="font-semibold text-gray-500 text-sm">
-                    INIT...
-                </span>
-            </div>
-            <canvas id="brakes-monitor" height="60" class="w-full bg-black rounded"></canvas>
-        </div>
-
-        {{-- Switchtrack Monitor --}}
-        <div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="font-medium text-gray-300">Switchtrack ESP:</span>
-                <span id="switchtrack-connect-status" class="font-semibold text-gray-500 text-sm">
-                    INIT...
-                </span>
-            </div>
-            <canvas id="switchtrack-monitor" height="60" class="w-full bg-black rounded"></canvas>
-        </div>
-
-    </div>
-</div>
 
         </div>
     </div>
 
-<script>
-    const MQTT_HOST = "{{ env('PI_IP') }}"; 
-    const client = mqtt.connect(`ws://${MQTT_HOST}:9001`);
-    const logList = document.getElementById('event-log-list');
-    const MAX_LOG_ENTRIES = 50;
-
-    let stationMonitor, tiltdropMonitor, switchtrackMonitor;
-
-    // === KLASSE VOOR DE HARTMONITOR ===
-    class HeartbeatMonitor {
-        constructor(canvasId) {
-            this.canvas = document.getElementById(canvasId);
-            this.ctx = this.canvas.getContext('2d');
-            this.width = this.canvas.width = this.canvas.offsetWidth;
-            this.height = this.canvas.height;
-            
-            this.baseLine = this.height / 2;
-            this.color = '#374151'; 
-            this.dataPoints = Array(this.width).fill(this.baseLine);
-            this.pingQueue = [];
-            
-            this.blipPattern = [0, -10, -25, 0, 15, 28, 10, -5, 0];
-            this.blipRequested = false;
-
-            this.draw();
-        }
-
-        setColor(hexColor) {
-            this.color = hexColor;
-        }
-
-        ping() {
-            this.blipRequested = true;
-        }
-
-        draw() {
-            this.ctx.clearRect(0, 0, this.width, this.height);
-
-            if (this.blipRequested && this.pingQueue.length === 0) {
-                this.pingQueue.push(...this.blipPattern);
-                this.blipRequested = false;
-            }
-
-            this.dataPoints.shift();
-
-            let newPoint;
-            if (this.pingQueue.length > 0) {
-                newPoint = this.baseLine + this.pingQueue.shift();
-            } else {
-                newPoint = this.baseLine + (Math.random() * 2 - 1);
-            }
-            this.dataPoints.push(newPoint);
-
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = this.color;
-            this.ctx.lineWidth = 2.5;
-            this.ctx.shadowBlur = 4;
-            this.ctx.shadowColor = this.color;
-            this.ctx.moveTo(0, this.dataPoints[0]);
-
-            for (let i = 1; i < this.width; i++) {
-                this.ctx.lineTo(i, this.dataPoints[i]);
-            }
-            this.ctx.stroke();
-            this.ctx.shadowBlur = 0;
-
-            requestAnimationFrame(() => this.draw());
-        }
-    }
-
-    // === HEARTBEAT / LWT LOGICA ===
-    const HEARTBEAT_TIMEOUT_MS = 4500;
-    const HEARTBEAT_TIMERS = { station: null, tiltdrop: null, switchtrack: null };
-
-    function setConnectStatus(device, status) {
-        const el = document.getElementById(`${device}-connect-status`);
-        const monitor =
-            device === 'station' ? stationMonitor :
-            device === 'tiltdrop' ? tiltdropMonitor :
-            device === 'brakes' ? brakesMonitor :
-            device === 'switchtrack' ? switchtrackMonitor :
-            null;
-
-        if (!el || !monitor) return;
-
-        el.classList.remove('text-green-400', 'text-red-400', 'text-gray-400');
-        let text = 'INIT...';
-        let color = '#9ca3af';
-
-        if (status === 'online') {
-            el.classList.add('text-green-400');
-            text = 'ONLINE';
-            color = '#22c55e';
-        } else if (status === 'offline') {
-            el.classList.add('text-red-400');
-            text = 'OFFLINE';
-            color = '#f87171';
-        } else {
-            el.classList.add('text-gray-400');
-        }
-        
-        el.innerText = text;
-        monitor.setColor(color);
-    }
-
-    function resetHeartbeatTimer(device) {
-        if (HEARTBEAT_TIMERS[device]) {
-            clearTimeout(HEARTBEAT_TIMERS[device]);
-        }
-        
-        setConnectStatus(device, 'online');
-
-        const monitor =
-            device === 'station' ? stationMonitor :
-            device === 'tiltdrop' ? tiltdropMonitor :
-            device === 'brakes' ? brakesMonitor :
-            device === 'switchtrack' ? switchtrackMonitor :
-            null;
-
-        if (monitor) monitor.ping();
-        
-        HEARTBEAT_TIMERS[device] = setTimeout(() => {
-            console.warn(`Heartbeat timeout for ${device}.`);
-            setConnectStatus(device, 'offline');
-            addLogEntry(`TIMEOUT`, `${device} is offline. Geen heartbeat ontvangen.`, 'error');
-        }, HEARTBEAT_TIMEOUT_MS);
-    }
-
-    // === LOG FUNCTIE ===
-    function addLogEntry(topic, message, level = 'info') {
-        if (logList.children.length > MAX_LOG_ENTRIES) {
-            logList.removeChild(logList.firstChild);
-        }
-        const li = document.createElement('li');
-        const timestamp = new Date().toLocaleTimeString();
-        let colorClass = 'text-gray-700';
-        if (level === 'error') colorClass = 'text-red-600';
-        if (level === 'warn') colorClass = 'text-yellow-600';
-
-        li.className = `p-2 rounded ${level === 'info' ? 'bg-gray-50' : 'bg-red-50'} ${colorClass}`;
-        li.innerHTML = `
-            <span class="text-gray-500">[${timestamp}]</span> 
-            <strong class="text-black">${topic}:</strong> ${message}
-        `;
-        logList.appendChild(li);
-        logList.parentElement.scrollTop = logList.parentElement.scrollHeight;
-    }
-
-    // === MQTT CONNECTIE ===
-    client.on('connect', () => {
-        console.log('MQTT connected!');
-        client.subscribe('rollercoaster/station/status');
-        client.subscribe('rollercoaster/tiltdrop/status');
-        client.subscribe('rollercoaster/brakes/status');
-        client.subscribe('rollercoaster/switchtrack/status');
-        client.subscribe('rollercoaster/log');
-        client.subscribe('rollercoaster/estop');
-        addLogEntry('MQTT', 'Verbonden met de broker.', 'success');
-
-        ['station','tiltdrop', 'brakes', 'switchtrack'].forEach(dev => {
-            if (HEARTBEAT_TIMERS[dev]) clearTimeout(HEARTBEAT_TIMERS[dev]);
-            HEARTBEAT_TIMERS[dev] = setTimeout(() => {
-                setConnectStatus(dev, 'offline');
-                addLogEntry(`TIMEOUT`, `${dev} ESP was nooit online.`, 'error');
-            }, HEARTBEAT_TIMEOUT_MS);
-        });
-    });
-
-    // === MQTT MESSAGES ===
-    client.on('message', (topic, payload) => {
-        const msg = payload.toString().trim();
-
-        if (topic === 'rollercoaster/station/status' && msg.toLowerCase() === 'online') {
-            resetHeartbeatTimer('station'); return;
-        }
-        if (topic === 'rollercoaster/tiltdrop/status' && msg.toLowerCase() === 'online') {
-            resetHeartbeatTimer('tiltdrop'); return;
-        }
-        if (topic === 'rollercoaster/brakes/status' && msg.toLowerCase() === 'online') {
-            resetHeartbeatTimer('brakes'); return;
-        }
-        if (topic === 'rollercoaster/switchtrack/status' && msg.toLowerCase() === 'online') {
-            resetHeartbeatTimer('switchtrack'); return;
-        }
-
-        if (topic === 'rollercoaster/log') {
-            addLogEntry('LOG', msg);
-        }
-        if (topic === 'rollercoaster/estop' && msg.toLowerCase() === 'true') {
-            addLogEntry('E-STOP', 'EMERGENCY STOP GEACTIVEERD!', 'error');
-        }
-    });
-
-    // === INIT ===
-    document.addEventListener('DOMContentLoaded', () => {
-        stationMonitor = new HeartbeatMonitor('station-monitor');
-        tiltdropMonitor = new HeartbeatMonitor('tiltdrop-monitor');
-        brakesMonitor = new HeartbeatMonitor('brakes-monitor');
-        switchtrackMonitor = new HeartbeatMonitor('switchtrack-monitor');
-
-        setConnectStatus('station', 'unknown');
-        setConnectStatus('tiltdrop', 'unknown');
-        setConnectStatus('brakes', 'unknown');
-        setConnectStatus('switchtrack', 'unknown');
-
-        const firstLog = logList.querySelector('li');
-        if (firstLog && firstLog.textContent.includes('Wachten')) {
-            logList.removeChild(firstLog);
-        }
-        addLogEntry('SYSTEM', 'Pagina geladen. Bezig met verbinden...');
-    });
-
-    client.publish('rollercoaster/test', 'hello from browser');
-
-</script>
 </x-layout>

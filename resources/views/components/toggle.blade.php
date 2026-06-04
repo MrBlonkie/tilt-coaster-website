@@ -43,9 +43,9 @@
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: white;
+        background: #9ca3af;
         transform: translateY(-50%);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.15);
         transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1),
                     box-shadow 0.2s ease;
     }

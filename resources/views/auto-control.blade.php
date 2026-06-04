@@ -78,7 +78,7 @@
             <div class="flex flex-col gap-4">
 
                 {{-- System Events --}}
-                <div class="flex-1 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="flex-1 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden min-h-0">
                     <div class="px-5 py-3.5 border-b border-gray-700 flex items-center gap-3 shrink-0">
                         <div class="flex gap-1.5">
                             <div class="h-3 w-3 rounded-full bg-red-400"></div>
@@ -88,12 +88,12 @@
                         <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">System Events</h2>
                     </div>
                     <div class="p-3 flex-1 bg-gray-900 min-h-0">
-                        <div id="eventLogs" class="h-full overflow-y-auto font-mono text-xs text-blue-400 space-y-1"></div>
+                        <div id="eventLogs" class="h-56 overflow-y-auto font-mono text-xs text-blue-400 space-y-1"></div>
                     </div>
                 </div>
 
                 {{-- Block Logic Logs --}}
-                <div class="flex-1 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="flex-1 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden min-h-0">
                     <div class="px-5 py-3.5 border-b border-gray-700 flex items-center gap-3 shrink-0">
                         <div class="flex gap-1.5">
                             <div class="h-3 w-3 rounded-full bg-red-400"></div>
@@ -103,7 +103,7 @@
                         <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Block Logic Logs</h2>
                     </div>
                     <div class="p-3 flex-1 bg-gray-900 min-h-0">
-                        <div id="blockLogs" class="h-full overflow-y-auto font-mono text-xs text-emerald-400 space-y-1"></div>
+                        <div id="blockLogs" class="h-56 overflow-y-auto font-mono text-xs text-emerald-400 space-y-1"></div>
                     </div>
                 </div>
 

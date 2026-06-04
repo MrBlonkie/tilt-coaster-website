@@ -84,10 +84,6 @@ client.on('connect', () => {
         'rollercoaster/brakes/status',
         'rollercoaster/switchtrack/status',
         'rollercoaster/event',
-        'station/status',
-        'tiltdrop/status',
-        'brakes/status',
-        'switchtrack/status',
         'rollercoaster/block/event',
     ]);
 
@@ -130,26 +126,16 @@ client.on('message', (topic, payload) => {
 
     if (topic === 'rollercoaster/block/event') {
         addLog(msg, 'blockLogs');
+        const match = msg.match(/^(\w+)_(occupied|free)$/);
+        if (match) applyBlockColor(match[1], match[2] === 'occupied');
+        return;
     }
 
     if (topic === 'rollercoaster/event') {
         addLog(msg, 'eventLogs');
-
         if (msg.toLowerCase() === 'tiltdrop_opening') animateTiltdrop(true);
         if (msg.toLowerCase() === 'tiltdrop_resetting') animateTiltdrop(false);
     }
-
-    let data;
-    try {
-        data = JSON.parse(msg);
-    } catch (e) {
-        return;
-    }
-
-    if (topic === 'station/status') updateStationUI(data);
-    if (topic === 'tiltdrop/status') updateTiltdropUI(data);
-    if (topic === 'brakes/status') updateBrakesUI(data);
-    if (topic === 'switchtrack/status') updateSwitchtrackUI(data);
 });
 
 function setConnectStatus(device, status) {
@@ -256,44 +242,27 @@ function setStroke(id, color) {
     if (el) el.setAttribute('stroke', color);
 }
 
-function updateStationUI(data) {
-    if (!data) return;
-    const sc = data.blocks.isStationOccupied ? '#ef4444' : '#22c55e';
-    const sf = data.blocks.isStationOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
-    const lc = data.blocks.isLifthillOccupied ? '#ef4444' : '#22c55e';
-    const lf = data.blocks.isLifthillOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
-    setFill('station-stroke', sc);
-    setStroke('station-lifthill-turn', data.cartOnTurn ? '#ef4444' : '#22c55e');
-    setFill('lifthill-stroke', lc);
-    setStroke('station-block-section', sc);
-    setFill('station-block-section', sf);
-    setStroke('lifthill-block-section', lc);
-    setFill('lifthill-block-section', lf);
+const BLOCK_CONFIG = {
+    station:     { fills: ['station-stroke'],                                                              strokeFills: ['station-block-section'] },
+    lifthill:    { fills: ['lifthill-stroke'],                                                             strokeFills: ['lifthill-block-section'] },
+    brakes:      { fills: ['brake-stroke'],                                                                strokeFills: ['brakes-block-section'] },
+    layout:      { strokes: ['layout-stroke'] },
+    tiltdrop:    { fills: ['tiltdrop-enter-stroke', 'tiltdrop-stroke', 'tiltdrop-exit-stroke', 'tiltdrop-hinge'], strokeFills: ['tiltdrop-block-section'] },
+    switchtrack: { fills: ['switch-base-shape', 'switch-stroke'],                                         strokeFills: ['switchtrack-block-section'] },
+};
+
+function applyBlockColor(block, occupied) {
+    const cfg = BLOCK_CONFIG[block];
+    if (!cfg) return;
+    const c = occupied ? '#ef4444' : '#22c55e';
+    const f = occupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
+    cfg.fills?.forEach(id => setFill(id, c));
+    cfg.strokes?.forEach(id => setStroke(id, c));
+    cfg.strokeFills?.forEach(id => { setStroke(id, c); setFill(id, f); });
 }
 
-function updateTiltdropUI(data) {
-    if (!data) return;
-    const c = data.blocks.isTiltdropOccupied ? '#ef4444' : '#22c55e';
-    const f = data.blocks.isTiltdropOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
-    setStroke('layout-stroke', data.trainOnLayout ? '#ef4444' : '#22c55e');
-    setStroke('tiltdrop-block-section', c);
-    setFill('tiltdrop-block-section', f);
-}
-
-function updateBrakesUI(data) {
-    if (!data) return;
-    const c = data.blocks?.isBrakesOccupied ? '#ef4444' : '#22c55e';
-    const f = data.blocks?.isBrakesOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
-    setStroke('brakes-block-section', c);
-    setFill('brakes-block-section', f);
-}
-
-function updateSwitchtrackUI(data) {
-    if (!data) return;
-    const c = data.blocks.isSwitchtrackOccupied ? '#ef4444' : '#22c55e';
-    const f = data.blocks.isSwitchtrackOccupied ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)';
-    setStroke('switchtrack-block-section', c);
-    setFill('switchtrack-block-section', f);
+function initMimic() {
+    Object.keys(BLOCK_CONFIG).forEach(block => applyBlockColor(block, false));
 }
 
 let currentTiltAngle = 0;
@@ -345,4 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setConnectStatus('tiltdrop', 'unknown');
     setConnectStatus('brakes', 'unknown');
     setConnectStatus('switchtrack', 'unknown');
+
+    initMimic();
 });

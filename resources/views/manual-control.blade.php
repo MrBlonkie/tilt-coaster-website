@@ -5,12 +5,10 @@
 
         {{-- Hero --}}
         <div class="mb-8">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="h-2 w-2 rounded-full bg-[var(--color-ember)] animate-pulse"></span>
-                <span class="text-xs font-mono text-gray-400 uppercase tracking-widest">Handmatig Beheer</span>
+            <div class="flex items-center gap-4">
+                <div class="w-1 h-10 rounded-full shrink-0" style="background-color: var(--color-ember);"></div>
+                <h1 class="text-4xl font-bold text-white tracking-tight">Manual Control</h1>
             </div>
-            <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Manual Control</h1>
-            <p class="text-gray-500 mt-1 text-sm">Directe motorsturing per ESP-node — De Vliegende Vlaeminck</p>
         </div>
 
         @php
@@ -19,10 +17,10 @@
                 'key'    => 'station',
                 'label'  => 'Station ESP',
                 'toggle' => 'manual-switch-station',
-                'border' => 'border-blue-200',
-                'hbg'    => 'bg-blue-50',
+                'border' => 'border-blue-700',
+                'hbg'    => 'bg-blue-900/20',
                 'dot'    => 'bg-blue-500',
-                'text'   => 'text-blue-700',
+                'text'   => 'text-blue-400',
                 'motors' => [
                     ['id' => 'stationmotor',      'label' => 'Station Motor',       'actions' => ['on', 'off']],
                     ['id' => 'lifthillmotor',     'label' => 'Lifthill Motor',      'actions' => ['on', 'off']],
@@ -33,10 +31,10 @@
                 'key'    => 'tiltdrop',
                 'label'  => 'Tiltdrop ESP',
                 'toggle' => 'manual-switch-tiltdrop',
-                'border' => 'border-amber-200',
-                'hbg'    => 'bg-amber-50',
+                'border' => 'border-amber-700',
+                'hbg'    => 'bg-amber-900/20',
                 'dot'    => 'bg-amber-500',
-                'text'   => 'text-amber-700',
+                'text'   => 'text-amber-400',
                 'motors' => [
                     ['id' => 'tiltdropmotor',    'label' => 'Tiltdrop Motor',    'actions' => ['open', 'close']],
                     ['id' => 'releasedropmotor', 'label' => 'Releasedrop Motor', 'actions' => ['open', 'close']],
@@ -46,10 +44,10 @@
                 'key'    => 'brakes',
                 'label'  => 'Brakes ESP',
                 'toggle' => 'manual-switch-brakes',
-                'border' => 'border-rose-200',
-                'hbg'    => 'bg-rose-50',
+                'border' => 'border-rose-700',
+                'hbg'    => 'bg-rose-900/20',
                 'dot'    => 'bg-rose-500',
-                'text'   => 'text-rose-700',
+                'text'   => 'text-rose-400',
                 'motors' => [
                     ['id' => 'releasebrakesmotor', 'label' => 'Release Brakes Motor', 'actions' => ['open', 'close']],
                 ],
@@ -58,10 +56,10 @@
                 'key'    => 'switchtrack',
                 'label'  => 'Switchtrack ESP',
                 'toggle' => 'manual-switch-switchtrack',
-                'border' => 'border-violet-200',
-                'hbg'    => 'bg-violet-50',
+                'border' => 'border-violet-700',
+                'hbg'    => 'bg-violet-900/20',
                 'dot'    => 'bg-violet-500',
-                'text'   => 'text-violet-700',
+                'text'   => 'text-violet-400',
                 'motors' => [
                     ['id' => 'switchtrackmotor',        'label' => 'Switchtrack Motor',         'actions' => ['brakes', 'station']],
                     ['id' => 'releaseswitchtrackmotor', 'label' => 'Release Switchtrack Motor', 'actions' => ['open', 'close']],

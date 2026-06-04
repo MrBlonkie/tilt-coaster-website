@@ -88,7 +88,7 @@ function updateMotorUI() {
     const map = [
         { id: 'stationmotor',            esp: 'station',     path: ['motors', 'station', 'stationStepperState'] },
         { id: 'lifthillmotor',           esp: 'station',     path: ['motors', 'lift', 'liftStepperState'] },
-        { id: 'stationgatesmotor',       esp: 'station',     path: ['gates', 'gatesMotorState'] },
+        { id: 'stationgatesmotor',       esp: 'station',     path: ['motors', 'station', 'gatesServoState'], type: 'gates' },
         { id: 'tiltdropmotor',           esp: 'tiltdrop',    type: 'tiltdrop' },
         { id: 'releasedropmotor',        esp: 'tiltdrop',    path: ['tiltdrop', 'releasedropMotorState'] },
         { id: 'switchtrackmotor',        esp: 'switchtrack', field: 'rotateTarget', type: 'switchtrack' },
@@ -101,7 +101,8 @@ function updateMotorUI() {
         if (!el) return;
 
         el.classList.remove(
-            'text-emerald-400', 'text-red-400', 'text-yellow-400', 'text-orange-400', 'text-gray-600',
+            'text-emerald-400', 'text-red-400', 'text-yellow-400', 'text-orange-400', 'text-gray-400', 'text-gray-600',
+            'bg-emerald-900/30', 'bg-red-900/30', 'bg-yellow-900/30', 'bg-orange-900/30', 'bg-gray-700',
             'bg-emerald-50', 'bg-red-50', 'bg-yellow-50', 'bg-orange-50', 'bg-gray-100'
         );
 
@@ -114,16 +115,16 @@ function updateMotorUI() {
             const target = getNested(currentStatus.switchtrack, ['switchtrack', 'manualRotateTarget']);
 
             if (moving) {
-                el.classList.add('text-yellow-400', 'bg-yellow-50');
+                el.classList.add('text-yellow-400', 'bg-yellow-900/30');
                 el.innerText = 'MOVING';
             } else if (target === 'station') {
-                el.classList.add('text-emerald-400', 'bg-emerald-50');
+                el.classList.add('text-emerald-400', 'bg-emerald-900/30');
                 el.innerText = 'STATION';
             } else if (target === 'brakes') {
-                el.classList.add('text-emerald-400', 'bg-emerald-50');
+                el.classList.add('text-emerald-400', 'bg-emerald-900/30');
                 el.innerText = 'BRAKES';
             } else {
-                el.classList.add('text-gray-600', 'bg-gray-100');
+                el.classList.add('text-gray-400', 'bg-gray-700');
                 el.innerText = 'UNKNOWN';
             }
             return;
@@ -135,29 +136,43 @@ function updateMotorUI() {
             const closed = getNested(currentStatus.tiltdrop, ['sensors', 'hallSensorTiltdropClosedState']);
 
             if (moving) {
-                el.classList.add('text-red-400', 'bg-red-50');
+                el.classList.add('text-yellow-400', 'bg-yellow-900/30');
                 el.innerText = 'MOVING';
             } else if (open) {
-                el.classList.add('text-orange-400', 'bg-orange-50');
+                el.classList.add('text-emerald-400', 'bg-emerald-900/30');
                 el.innerText = 'OPEN';
             } else if (closed) {
-                el.classList.add('text-emerald-400', 'bg-emerald-50');
+                el.classList.add('text-red-400', 'bg-red-900/30');
                 el.innerText = 'CLOSED';
             } else {
-                el.classList.add('text-gray-600', 'bg-gray-100');
+                el.classList.add('text-gray-400', 'bg-gray-700');
+                el.innerText = 'UNKNOWN';
+            }
+            return;
+        }
+
+        if (m.type === 'gates') {
+            if (val === true) {
+                el.classList.add('text-emerald-400', 'bg-emerald-900/30');
+                el.innerText = 'OPEN';
+            } else if (val === false) {
+                el.classList.add('text-red-400', 'bg-red-900/30');
+                el.innerText = 'CLOSED';
+            } else {
+                el.classList.add('text-gray-400', 'bg-gray-700');
                 el.innerText = 'UNKNOWN';
             }
             return;
         }
 
         if (val === true) {
-            el.classList.add('text-emerald-400', 'bg-emerald-50');
+            el.classList.add('text-emerald-400', 'bg-emerald-900/30');
             el.innerText = 'ON';
         } else if (val === false) {
-            el.classList.add('text-red-400', 'bg-red-50');
+            el.classList.add('text-red-400', 'bg-red-900/30');
             el.innerText = 'OFF';
         } else {
-            el.classList.add('text-gray-600', 'bg-gray-100');
+            el.classList.add('text-gray-400', 'bg-gray-700');
             el.innerText = 'UNKNOWN';
         }
     });

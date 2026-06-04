@@ -5,21 +5,19 @@
 
         {{-- Hero --}}
         <div class="mb-8">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="h-2 w-2 rounded-full bg-[var(--color-ember)] animate-pulse"></span>
-                <span class="text-xs font-mono text-gray-400 uppercase tracking-widest">Automatisch Beheer</span>
+            <div class="flex items-center gap-4">
+                <div class="w-1 h-10 rounded-full shrink-0" style="background-color: var(--color-ember);"></div>
+                <h1 class="text-4xl font-bold text-white tracking-tight">Auto Control</h1>
             </div>
-            <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Auto Control</h1>
-            <p class="text-gray-500 mt-1 text-sm">Bloksysteem besturing — De Vliegende Vlaeminck</p>
         </div>
 
         {{-- BOVENSTE RIJ: Mimic Panel + Terminals --}}
         <div class="grid grid-cols-3 gap-6">
 
             {{-- KOLOM 1-2: VISUELE BAAN (MIMIC PANEL) --}}
-            <div class="col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
-                <div class="px-5 py-3.5 border-b border-gray-200 shrink-0">
-                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Mimic Panel</h2>
+            <div class="col-span-2 bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                <div class="px-5 py-3.5 border-b border-gray-700 shrink-0">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Mimic Panel</h2>
                 </div>
                 <div class="px-4 pt-4 bg-gray-900">
                     <svg viewBox="0 0 910 488" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -80,14 +78,14 @@
             <div class="flex flex-col gap-4">
 
                 {{-- System Events --}}
-                <div class="flex-1 flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="px-5 py-3.5 border-b border-gray-200 flex items-center gap-3 shrink-0">
+                <div class="flex-1 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-gray-700 flex items-center gap-3 shrink-0">
                         <div class="flex gap-1.5">
                             <div class="h-3 w-3 rounded-full bg-red-400"></div>
                             <div class="h-3 w-3 rounded-full bg-yellow-400"></div>
                             <div class="h-3 w-3 rounded-full bg-green-400"></div>
                         </div>
-                        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">System Events</h2>
+                        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">System Events</h2>
                     </div>
                     <div class="p-3 flex-1 bg-gray-900 min-h-0">
                         <div id="eventLogs" class="h-full overflow-y-auto font-mono text-xs text-blue-400 space-y-1"></div>
@@ -95,14 +93,14 @@
                 </div>
 
                 {{-- Block Logic Logs --}}
-                <div class="flex-1 flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="px-5 py-3.5 border-b border-gray-200 flex items-center gap-3 shrink-0">
+                <div class="flex-1 flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-gray-700 flex items-center gap-3 shrink-0">
                         <div class="flex gap-1.5">
                             <div class="h-3 w-3 rounded-full bg-red-400"></div>
                             <div class="h-3 w-3 rounded-full bg-yellow-400"></div>
                             <div class="h-3 w-3 rounded-full bg-green-400"></div>
                         </div>
-                        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Block Logic Logs</h2>
+                        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Block Logic Logs</h2>
                     </div>
                     <div class="p-3 flex-1 bg-gray-900 min-h-0">
                         <div id="blockLogs" class="h-full overflow-y-auto font-mono text-xs text-emerald-400 space-y-1"></div>
@@ -117,17 +115,17 @@
         <div class="grid grid-cols-2 gap-6 mt-6">
 
             {{-- Connection Card --}}
-            <div class="flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-5 py-3.5 border-b border-gray-200 flex items-center justify-between shrink-0">
-                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Systeem Status</h2>
-                    <span class="text-xs font-mono text-gray-400">ESP NODES</span>
+            <div class="flex flex-col bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-gray-700 flex items-center justify-between shrink-0">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Systeem Status</h2>
+                    <span class="text-xs font-mono text-gray-500">ESP NODES</span>
                 </div>
                 <div class="p-4 flex flex-col space-y-4">
 
                     {{-- MQTT verbinding --}}
-                    <div class="pb-3 border-b border-gray-100">
+                    <div class="pb-3 border-b border-gray-700">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-mono text-gray-500">MQTT broker</span>
+                            <span class="text-xs font-mono text-gray-400">MQTT broker</span>
                             <span id="mqtt-broker-status" class="text-xs font-mono font-bold text-gray-400">CONNECTING...</span>
                         </div>
                     </div>
@@ -138,45 +136,45 @@
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <div class="flex items-baseline gap-2">
-                                    <span class="text-xs font-mono text-gray-500 uppercase tracking-wide">Station ESP</span>
-                                    <span id="last-hb-station" class="text-[10px] font-mono text-gray-400">...</span>
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Station ESP</span>
+                                    <span id="last-hb-station" class="text-[10px] font-mono text-gray-500">...</span>
                                 </div>
                                 <span id="station-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
                             </div>
-                            <canvas id="station-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-200"></canvas>
+                            <canvas id="station-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
                         </div>
 
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <div class="flex items-baseline gap-2">
-                                    <span class="text-xs font-mono text-gray-500 uppercase tracking-wide">Tiltdrop ESP</span>
-                                    <span id="last-hb-tiltdrop" class="text-[10px] font-mono text-gray-400">...</span>
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Tiltdrop ESP</span>
+                                    <span id="last-hb-tiltdrop" class="text-[10px] font-mono text-gray-500">...</span>
                                 </div>
                                 <span id="tiltdrop-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
                             </div>
-                            <canvas id="tiltdrop-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-200"></canvas>
+                            <canvas id="tiltdrop-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
                         </div>
 
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <div class="flex items-baseline gap-2">
-                                    <span class="text-xs font-mono text-gray-500 uppercase tracking-wide">Brakes ESP</span>
-                                    <span id="last-hb-brakes" class="text-[10px] font-mono text-gray-400">...</span>
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Brakes ESP</span>
+                                    <span id="last-hb-brakes" class="text-[10px] font-mono text-gray-500">...</span>
                                 </div>
                                 <span id="brakes-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
                             </div>
-                            <canvas id="brakes-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-200"></canvas>
+                            <canvas id="brakes-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
                         </div>
 
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <div class="flex items-baseline gap-2">
-                                    <span class="text-xs font-mono text-gray-500 uppercase tracking-wide">Switchtrack ESP</span>
-                                    <span id="last-hb-switchtrack" class="text-[10px] font-mono text-gray-400">...</span>
+                                    <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">Switchtrack ESP</span>
+                                    <span id="last-hb-switchtrack" class="text-[10px] font-mono text-gray-500">...</span>
                                 </div>
                                 <span id="switchtrack-connect-status" class="text-xs font-mono font-bold text-gray-400">INIT...</span>
                             </div>
-                            <canvas id="switchtrack-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-200"></canvas>
+                            <canvas id="switchtrack-monitor" height="36" class="w-full rounded bg-gray-900 border border-gray-700"></canvas>
                         </div>
 
                     </div>
@@ -184,12 +182,12 @@
             </div>
 
             {{-- ESP Resets --}}
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-5 py-3.5 border-b border-gray-200 flex items-center justify-between">
-                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-widest">ESP Resets</h2>
-                    <span class="text-xs font-mono text-gray-400">FORCE RESTART</span>
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-gray-700 flex items-center justify-between">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">ESP Resets</h2>
+                    <span class="text-xs font-mono text-gray-500">FORCE RESTART</span>
                 </div>
-                <div class="divide-y divide-gray-100">
+                <div class="divide-y divide-gray-700">
                     @foreach([
                         ['esp' => 'station',    'label' => 'Station'],
                         ['esp' => 'lifthill',   'label' => 'Lifthill'],
@@ -199,12 +197,12 @@
                     ] as $node)
                     <div class="flex items-center justify-between px-4 py-2.5">
                         <div class="flex items-center gap-2">
-                            <span class="h-1.5 w-1.5 rounded-full bg-gray-300"></span>
-                            <span class="text-xs font-mono text-gray-600 uppercase tracking-wide">{{ $node['label'] }}</span>
+                            <span class="h-1.5 w-1.5 rounded-full bg-gray-500"></span>
+                            <span class="text-xs font-mono text-gray-400 uppercase tracking-wide">{{ $node['label'] }}</span>
                         </div>
                         <button data-esp="{{ $node['esp'] }}" class="clear-btn text-xs font-bold font-mono uppercase tracking-widest px-3 py-1.5 rounded-md
-                            bg-amber-50 hover:bg-amber-500 text-amber-700 hover:text-white
-                            border border-amber-200 hover:border-amber-500 transition-all duration-150 active:scale-95">
+                            bg-amber-900/20 hover:bg-amber-500 text-amber-400 hover:text-white
+                            border border-amber-700/50 hover:border-amber-500 transition-all duration-150 active:scale-95">
                             Reset
                         </button>
                     </div>

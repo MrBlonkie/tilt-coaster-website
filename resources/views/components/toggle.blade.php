@@ -28,8 +28,8 @@
         width: 84px;
         height: 42px;
         border-radius: 42px;
-        background: #e5e7eb;
-        border: 1.5px solid #d1d5db;
+        background: #374151;
+        border: 1.5px solid #4b5563;
         cursor: pointer;
         transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }

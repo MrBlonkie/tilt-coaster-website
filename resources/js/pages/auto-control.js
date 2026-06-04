@@ -243,7 +243,7 @@ function setStroke(id, color) {
 }
 
 const BLOCK_CONFIG = {
-    station:     { fills: ['station-stroke'],                                                              strokeFills: ['station-block-section'] },
+    station:     { fills: ['station-stroke'], strokes: ['station-lifthill-turn'],                         strokeFills: ['station-block-section'] },
     lifthill:    { fills: ['lifthill-stroke'],                                                             strokeFills: ['lifthill-block-section'] },
     brakes:      { fills: ['brake-stroke'],                                                                strokeFills: ['brakes-block-section'] },
     layout:      { strokes: ['layout-stroke'] },

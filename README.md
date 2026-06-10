@@ -1,1 +1,1 @@
-11 juli tem 15 augustus school dicht
+![De Vliegende Vlaeminck](media/blue-bw-DSC_0207.JPG)

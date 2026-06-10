@@ -28,12 +28,19 @@ class ManualControlController extends Controller
             $switchtrackJson = MqttMessage::where('topic', 'switchtrack/status')->latest()->value('message');
         }
 
-        $station = $stationJson ? json_decode($stationJson, true) : null;
-        $tiltdrop = $tiltdropJson ? json_decode($tiltdropJson, true) : null;
-        $brakes = $brakesJson ? json_decode($brakesJson, true) : null;
-        $switchtrack = $switchtrackJson ? json_decode($switchtrackJson, true) : null;
+        $station     = $this->isJson($stationJson) ? json_decode($stationJson, true) : null;
+        $tiltdrop    = $this->isJson($tiltdropJson) ? json_decode($tiltdropJson, true) : null;
+        $brakes      = $this->isJson($brakesJson) ? json_decode($brakesJson, true) : null;
+        $switchtrack = $this->isJson($switchtrackJson) ? json_decode($switchtrackJson, true) : null;
 
         return view('manual-control', compact('station', 'tiltdrop', 'brakes', 'switchtrack'));
+    }
+
+    private function isJson(?string $string): bool
+    {
+        if (!$string) return false;
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     public function indexV2()

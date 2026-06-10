@@ -91,7 +91,7 @@ function updateMotorUI() {
         { id: 'stationgatesmotor',       esp: 'station',     path: ['motors', 'station', 'gatesServoState'], type: 'gates' },
         { id: 'tiltdropmotor',           esp: 'tiltdrop',    type: 'tiltdrop' },
         { id: 'releasedropmotor',        esp: 'tiltdrop',    path: ['tiltdrop', 'releasedropMotorState'] },
-        { id: 'switchtrackmotor',        esp: 'switchtrack', field: 'rotateTarget', type: 'switchtrack' },
+        { id: 'switchtrackmotor',        esp: 'switchtrack', type: 'switchtrack' },
         { id: 'releasebrakesmotor',      esp: 'brakes',      path: ['motors', 'releaseBrakesMotorState'] },
         { id: 'releaseswitchtrackmotor', esp: 'switchtrack', path: ['switchtrack', 'releaseswitchMotorState'] },
     ];
